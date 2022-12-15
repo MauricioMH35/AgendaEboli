@@ -1,7 +1,6 @@
-package com.eboli.models;
+package br.com.eboli.models;
 
 import lombok.*;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.io.Serializable;

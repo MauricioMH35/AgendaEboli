@@ -1,7 +1,6 @@
-package com.eboli.models;
+package br.com.eboli.models;
 
 import lombok.*;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -14,7 +13,7 @@ import java.io.Serializable;
 @Builder
 @Entity
 @Table(name = "tbl_addresses")
-public class Address extends RepresentationModel<Address> implements Serializable {
+public class Address implements Serializable {
 
     public final static long serialVersionUID = 1l;
 

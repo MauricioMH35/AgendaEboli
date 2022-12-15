@@ -1,13 +1,10 @@
-package com.eboli.models;
+package br.com.eboli.models;
 
-import com.eboli.models.enums.ContactType;
+import br.com.eboli.models.enums.ContactType;
 import lombok.*;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -17,7 +14,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "tbl_contacts")
-public class Contact extends RepresentationModel<Contact> implements Serializable {
+public class Contact implements Serializable {
 
     public static final long serialVersionUID = 1l;
 

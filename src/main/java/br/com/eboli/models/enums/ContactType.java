@@ -1,4 +1,4 @@
-package com.eboli.models.enums;
+package br.com.eboli.models.enums;
 
 public enum ContactType {
         PHONE,
