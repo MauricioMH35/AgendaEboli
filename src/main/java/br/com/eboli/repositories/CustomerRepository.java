@@ -22,6 +22,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     List<Customer> findByRegistered(LocalDateTime registered);
 
-    List<Customer> findByRegistered(LocalDateTime start, LocalDateTime end);
+    List<Customer> findByRegisteredBetween(LocalDateTime start, LocalDateTime end);
 
 }
