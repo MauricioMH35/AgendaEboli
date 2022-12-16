@@ -7,22 +7,22 @@ import java.time.format.DateTimeFormatter;
 public class DateFormatter {
 
     public static LocalDateTime parseDateTime(String dateTime) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH.mm.ss");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd HH-mm-ss");
         return LocalDateTime.parse(dateTime, fmt);
     }
 
     public static String parseDateTime(LocalDateTime dateTime) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH.mm.ss");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd HH-mm-ss");
         return dateTime.format(fmt);
     }
 
     public static LocalDate parseDate(String date) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         return LocalDate.parse(date, fmt);
     }
 
     public static String parseDate(LocalDate date) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         return date.format(fmt);
     }
 
