@@ -1,5 +1,7 @@
 package br.com.eboli.models;
 
+import br.com.eboli.models.requests.CustomerRequest;
+import br.com.eboli.utils.DateFormatter;
 import lombok.*;
 
 import javax.persistence.*;
@@ -40,6 +42,25 @@ public class Customer implements Serializable {
         this.cnpj = null;
         this.foundation = null;
         this.registered = null;
+    }
+
+    public Customer updateCustomer(CustomerRequest request) {
+        LocalDate foundationRequest = DateFormatter.parseDate(request.getFoundation());
+        LocalDateTime registeredRequest = DateFormatter.parseDateTime(request.getRegistered());
+
+        Long id = request.getId();
+        String fullname = request.getFullname() != this.fullname ? request.getFullname() : this.fullname;
+        String cnpj = request.getCnpj() != this.cnpj ? request.getCnpj() : this.cnpj;
+        LocalDate foundation = foundationRequest != this.foundation ? foundationRequest : this.foundation;
+        LocalDateTime registered = registeredRequest != this.registered ? registeredRequest : this.registered;
+
+        return Customer.builder()
+                .id(id)
+                .fullname(fullname)
+                .cnpj(cnpj)
+                .foundation(foundation)
+                .registered(registered)
+                .build();
     }
 
 }
