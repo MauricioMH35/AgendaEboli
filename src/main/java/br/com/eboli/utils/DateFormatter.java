@@ -7,12 +7,12 @@ import java.time.format.DateTimeFormatter;
 public class DateFormatter {
 
     public static LocalDateTime parseDateTime(String dateTime) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH.mm.ss");
         return LocalDateTime.parse(dateTime, fmt);
     }
 
     public static String parseDateTime(LocalDateTime dateTime) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH.mm.ss");
         return dateTime.format(fmt);
     }
 
