@@ -1,5 +1,6 @@
 package br.com.eboli.models;
 
+import br.com.eboli.models.requests.AddressRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -55,6 +56,35 @@ public class Address implements Serializable {
         this.city = null;
         this.state = null;
         this.zipCode = null;
+    }
+
+    public Address updateAddress(AddressRequest request) {
+        Long id = request.getId();
+        String publicPlace = request.getPublicPlace() != this.publicPlace ? request.getPublicPlace() : this.publicPlace;
+        Integer number = request.getNumber() != this.number ? request.getNumber() : this.number;
+        String complement = request.getComplement() != this.complement ? request.getComplement() : this.complement;
+        String neighborhood = request.getNeighborhood() != this.neighborhood ? request.getNeighborhood() : this.neighborhood;
+        String city = request.getCity() != this.city ? request.getCity() : this.city;
+        String state = request.getState() != this.state ? request.getState() : this.state;
+        String zipCode = request.getZipCode() != this.zipCode ? request.getZipCode() : this.zipCode;
+
+        return Address.builder()
+                .id(id)
+                .publicPlace(publicPlace)
+                .number(number)
+                .complement(complement)
+                .neighborhood(neighborhood)
+                .city(city)
+                .state(state)
+                .zipCode(zipCode)
+                .customer(Customer.builder()
+                        .id(request.getCustomerId())
+                        .fullname(null)
+                        .cnpj(null)
+                        .foundation(null)
+                        .registered(null)
+                        .build())
+                .build();
     }
 
 }
