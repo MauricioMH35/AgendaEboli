@@ -1,5 +1,7 @@
 package br.com.eboli.models;
 
+import br.com.eboli.models.requests.AgendaRequest;
+import br.com.eboli.utils.DateFormatter;
 import lombok.*;
 
 import javax.persistence.*;
@@ -48,6 +50,24 @@ public class Agenda implements Serializable {
         this.description = null;
         this.markedTo = null;
         this.concluded = null;
+    }
+
+    public Agenda updateAgenda(AgendaRequest request) {
+        LocalDateTime markedToRequest = DateFormatter.parseDateTime(request.getMarkedTo());
+
+        Long id = request.getId();
+        String title = request.getTitle().equals(this.title) ? this.title : request.getTitle();
+        String description = request.getDescription().equals(this.description) ? this.description : request.getDescription();
+        LocalDateTime markedTo = markedToRequest.equals(this.markedTo) ? this.markedTo : markedToRequest;
+        Boolean concluded = request.getConcluded().equals(this.concluded) ? this.concluded : request.getConcluded();
+
+        return Agenda.builder()
+                .id(id)
+                .title(title)
+                .description(description)
+                .markedTo(markedTo)
+                .concluded(concluded)
+                .build();
     }
 
 }
