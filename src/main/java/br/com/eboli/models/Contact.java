@@ -1,6 +1,7 @@
 package br.com.eboli.models;
 
 import br.com.eboli.models.enums.ContactType;
+import br.com.eboli.models.requests.ContactRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -37,6 +38,18 @@ public class Contact implements Serializable {
         this.id = null;
         this.type = null;
         this.contact = null;
+    }
+
+    public Contact updateContact(ContactRequest request) {
+        Long id = request.getId();
+        ContactType type = request.getType() != this.type ? request.getType() : this.type;
+        String contact = request.getContact() != this.contact ? request.getContact() : this.contact;
+
+        return Contact.builder()
+                .id(id)
+                .type(type)
+                .contact(contact)
+                .build();
     }
 
 }
