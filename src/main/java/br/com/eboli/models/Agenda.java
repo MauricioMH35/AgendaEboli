@@ -55,14 +55,13 @@ public class Agenda implements Serializable {
     public Agenda updateAgenda(AgendaRequest request) {
         LocalDateTime markedToRequest = DateFormatter.parseDateTime(request.getMarkedTo());
 
-        Long id = request.getId();
         String title = request.getTitle().equals(this.title) ? this.title : request.getTitle();
         String description = request.getDescription().equals(this.description) ? this.description : request.getDescription();
         LocalDateTime markedTo = markedToRequest.equals(this.markedTo) ? this.markedTo : markedToRequest;
         Boolean concluded = request.getConcluded().equals(this.concluded) ? this.concluded : request.getConcluded();
 
         return Agenda.builder()
-                .id(id)
+                .id(this.id)
                 .title(title)
                 .description(description)
                 .markedTo(markedTo)
