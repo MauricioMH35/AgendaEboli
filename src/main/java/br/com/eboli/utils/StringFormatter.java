@@ -6,4 +6,8 @@ public class StringFormatter {
         return target.replaceAll("_", " ");
     }
 
+    public static String replaceWhiteSpaceByUnderscore(String target) {
+        return target.replaceAll(" ", "_");
+    }
+
 }
