@@ -59,7 +59,6 @@ public class Address implements Serializable {
     }
 
     public Address updateAddress(AddressRequest request) {
-        Long id = request.getId();
         String publicPlace = request.getPublicPlace() != this.publicPlace ? request.getPublicPlace() : this.publicPlace;
         Integer number = request.getNumber() != this.number ? request.getNumber() : this.number;
         String complement = request.getComplement() != this.complement ? request.getComplement() : this.complement;
@@ -69,7 +68,7 @@ public class Address implements Serializable {
         String zipCode = request.getZipCode() != this.zipCode ? request.getZipCode() : this.zipCode;
 
         return Address.builder()
-                .id(id)
+                .id(this.id)
                 .publicPlace(publicPlace)
                 .number(number)
                 .complement(complement)
