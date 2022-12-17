@@ -48,14 +48,13 @@ public class Customer implements Serializable {
         LocalDate foundationRequest = DateFormatter.parseDate(request.getFoundation());
         LocalDateTime registeredRequest = DateFormatter.parseDateTime(request.getRegistered());
 
-        Long id = request.getId();
         String fullname = request.getFullname() != this.fullname ? request.getFullname() : this.fullname;
         String cnpj = request.getCnpj() != this.cnpj ? request.getCnpj() : this.cnpj;
         LocalDate foundation = foundationRequest != this.foundation ? foundationRequest : this.foundation;
         LocalDateTime registered = registeredRequest != this.registered ? registeredRequest : this.registered;
 
         return Customer.builder()
-                .id(id)
+                .id(this.id)
                 .fullname(fullname)
                 .cnpj(cnpj)
                 .foundation(foundation)
