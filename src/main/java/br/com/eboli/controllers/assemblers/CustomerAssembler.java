@@ -108,20 +108,24 @@ public class CustomerAssembler {
                     .find(Map.of("registered", replaceWhiteSpaceByUnderscore(response.getFoundation())))
             ).withRel("by-registered"));
             response.add(linkTo(methodOn(CustomerController.class)
-                    .find(Map.of(
-                            "foundation-start", "1960.01.01",
-                            "foundation-end", "2023.01.01"))
-            ).withRel("by-foundation-between"));
-            response.add(linkTo(methodOn(CustomerController.class)
-                    .find(Map.of(
-                            "registered-start", "1960.01.01_00-00-00",
-                            "registered-end", "2023.01.01_00-00-00"))
-            ).withRel("by-registered-between"));
-            response.add(linkTo(methodOn(CustomerController.class)
                     .findAll()
             ).withRel(IanaLinkRelations.COLLECTION));
         }
         CollectionModel collection = CollectionModel.of(responses);
+        collection.add(linkTo(methodOn(CustomerController.class)
+                .findAll()
+        ).withRel(IanaLinkRelations.COLLECTION));
+        collection.add(linkTo(methodOn(CustomerController.class)
+                .find(Map.of(
+                        "foundation-start", "1960.01.01",
+                        "foundation-end", "2023.01.01"))
+        ).withRel("by-foundation-between"));
+        collection.add(linkTo(methodOn(CustomerController.class)
+                .find(Map.of(
+                        "registered-start", "1960.01.01_00-00-00",
+                        "registered-end", "2023.01.01_00-00-00"))
+        ).withRel("by-registered-between"));
+
 
         return collection;
     }
