@@ -23,6 +23,9 @@ public class CustomerAssembler {
                 .findById(request.getId())
         ).withSelfRel());
         response.add(linkTo(methodOn(CustomerController.class)
+                .deleteById(request.getId())
+        ).withRel("delete-by-id"));
+        response.add(linkTo(methodOn(CustomerController.class)
                 .findByCnpj(request.getCnpj())
         ).withRel("by-cnpj"));
         response.add(linkTo(methodOn(CustomerController.class)
@@ -54,8 +57,8 @@ public class CustomerAssembler {
         response.add(linkTo(methodOn(CustomerController.class)
                 .findById(response.getId())).withSelfRel());
         response.add(linkTo(methodOn(CustomerController.class)
-                .findById(response.getId())
-        ).withSelfRel());
+                .deleteById(response.getId())
+        ).withRel("delete-by-id"));
         response.add(linkTo(methodOn(CustomerController.class)
                 .findByCnpj(response.getCnpj())
         ).withRel("by-cnpj"));
@@ -90,8 +93,8 @@ public class CustomerAssembler {
             response.add(linkTo(methodOn(CustomerController.class)
                     .findById(response.getId())).withSelfRel());
             response.add(linkTo(methodOn(CustomerController.class)
-                    .findById(response.getId())
-            ).withSelfRel());
+                    .deleteById(response.getId())
+            ).withRel("delete-by-id"));
             response.add(linkTo(methodOn(CustomerController.class)
                     .findByCnpj(response.getCnpj())
             ).withRel("by-cnpj"));
