@@ -121,8 +121,9 @@ public class CustomerAssembler {
                     .findAll()
             ).withRel(IanaLinkRelations.COLLECTION));
         }
+        CollectionModel collection = CollectionModel.of(responses);
 
-        return CollectionModel.of(responses);
+        return collection;
     }
 
 }
