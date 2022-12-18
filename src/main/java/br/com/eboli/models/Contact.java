@@ -43,11 +43,13 @@ public class Contact implements Serializable {
     public Contact updateContact(ContactRequest request) {
         ContactType type = request.getType() != this.type ? request.getType() : this.type;
         String contact = request.getContact() != this.contact ? request.getContact() : this.contact;
+        Customer customer = Customer.builder().id(request.getCustomerId()).build();
 
         return Contact.builder()
                 .id(this.id)
                 .type(type)
                 .contact(contact)
+                .customer(customer)
                 .build();
     }
 
