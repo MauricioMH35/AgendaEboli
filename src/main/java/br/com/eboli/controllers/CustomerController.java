@@ -19,6 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static br.com.eboli.controllers.assemblers.CustomerAssembler.toCollectionModel;
+import static br.com.eboli.controllers.assemblers.CustomerAssembler.toModel;
 import static br.com.eboli.utils.StringFormatter.replaceUnderscoreBySpace;
 
 @RestController
@@ -27,7 +29,6 @@ import static br.com.eboli.utils.StringFormatter.replaceUnderscoreBySpace;
 public class CustomerController {
 
     private final CustomerRepository repository;
-    private final CustomerAssembler hateoas;
 
     @PostMapping
     public ResponseEntity<CustomerResponse> save(@RequestBody CustomerRequest request) {
@@ -42,7 +43,7 @@ public class CustomerController {
 
         Long id = repository.save(CustomerRequest.parseToModel(request)).getId();
         request.setId(id);
-        return ResponseEntity.ok(hateoas.toModel(request));
+        return ResponseEntity.ok(toModel(request));
     }
 
     @GetMapping
@@ -54,7 +55,7 @@ public class CustomerController {
             throw new NotFoundException("Não foi possivel encontrar clientes cadastrados.");
         }
 
-        return ResponseEntity.ok(hateoas.toCollectionModel(responses));
+        return ResponseEntity.ok(toCollectionModel(responses));
     }
 
     @GetMapping("/{id}")
@@ -68,7 +69,7 @@ public class CustomerController {
                 .orElseThrow(() -> new NotFoundException(
                         "Não foi possivel encontrar o cliente indicado pelo identificador."))
         );
-        return ResponseEntity.ok(hateoas.toModel(response));
+        return ResponseEntity.ok(toModel(response));
     }
 
     @GetMapping("/cnpj/{cnpj}")
@@ -82,7 +83,7 @@ public class CustomerController {
                 .orElseThrow(() -> new NotFoundException(
                         "Não foi possivel encontrar o cliente indicado pelo CNPJ.")));
 
-        return ResponseEntity.ok(hateoas.toModel(response));
+        return ResponseEntity.ok(toModel(response));
     }
 
     @GetMapping("/find")
@@ -117,7 +118,7 @@ public class CustomerController {
                     "O parâmetro informado não é valido.");
         }
 
-        return ResponseEntity.ok(hateoas.toCollectionModel(responses));
+        return ResponseEntity.ok(toCollectionModel(responses));
     }
 
     @PutMapping("/{id}")
@@ -134,7 +135,7 @@ public class CustomerController {
                 .updateCustomer(request);
         repository.save(updated);
 
-        return ResponseEntity.ok(hateoas.toModel(CustomerResponse.parse(updated)));
+        return ResponseEntity.ok(toModel(CustomerResponse.parse(updated)));
     }
 
     @DeleteMapping("/{id}")
@@ -268,13 +269,6 @@ public class CustomerController {
                     "As datas de registro não são validas.");
 
         }
-    }
-
-    private static Boolean checkWhiteSpace(String target) {
-        final String regex = "(\\s+)";
-        final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        final Matcher matcher = pattern.matcher(target);
-        return matcher.find();
     }
 
     private Boolean checkDatePattern(String target) {
