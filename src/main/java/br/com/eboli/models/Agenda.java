@@ -42,10 +42,10 @@ public class Agenda implements Serializable {
     @Column
     private final Boolean concluded;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "tbl_agenda_customers",
             joinColumns = @JoinColumn(name = "agenda_id"),
-            inverseJoinColumns = @JoinColumn(name = "customers_id"))
+            inverseJoinColumns = @JoinColumn(name = "customer_id"))
     private Set<Customer> customers = new LinkedHashSet<>();
 
     private Agenda() {
