@@ -285,32 +285,4 @@ public class CustomerController {
         return matcher.find();
     }
 
-    private static String changeUnderlinesBySpace(String target) {
-        final String regex = "([a-zA-Z]+|[0-9]+)";
-        final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        final Matcher matcher = pattern.matcher(target);
-        String response = "";
-
-        while (matcher.find()) {
-            for (int i = 0; i < matcher.groupCount(); i++) {
-                response += matcher.group(i) + ' ';
-            }
-        }
-
-        return response;
-    }
-
-    private LocalDateTime changeDateTimePattern(String target) {
-        final String regex = "(\\d{4}.\\d{2}.\\d{2})_(\\d{2}-\\d{2}-\\d{2})";
-        final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        final Matcher matcher = pattern.matcher(target);
-
-        String dateTimeString = "";
-        while (matcher.find()) {
-            dateTimeString = matcher.group(1) + ' ' + matcher.group(2);
-        }
-
-        return DateFormatter.parseDateTime(dateTimeString);
-    }
-
 }
