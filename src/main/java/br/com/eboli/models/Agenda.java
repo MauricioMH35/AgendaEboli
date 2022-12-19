@@ -71,6 +71,7 @@ public class Agenda implements Serializable {
                 .description(description)
                 .markedTo(markedTo)
                 .concluded(concluded)
+                .customers(CustomerUtil.proccessToIds(request.getCustomerIds()))
                 .build();
     }
 
