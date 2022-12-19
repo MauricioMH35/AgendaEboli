@@ -7,10 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
+@Transactional
 public interface AgendaRepository extends JpaRepository<Agenda, Long> {
 
     List<Agenda> findByTitleContains(String title);
@@ -22,7 +24,7 @@ public interface AgendaRepository extends JpaRepository<Agenda, Long> {
     List<Agenda> findByConcluded(Boolean concluded);
 
     @Modifying
-    @Query("UPDATE Agenda SET concluded = :concluded WHERE id = :id")
-    void markConcluded(@Param(value = "id") Long id, @Param(value = "concluded") Boolean concluded);
+    @Query("UPDATE Agenda a SET a.concluded=true WHERE a.id=?1")
+    void markConcluded(Long id);
 
 }
