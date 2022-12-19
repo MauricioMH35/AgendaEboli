@@ -25,9 +25,9 @@ public class CustomerUtil {
 
     public static Set<Long> proccessToCustomerIds(Set<Customer> customers) {
         Set<Long> ids = new HashSet<>();
-        while (customers.iterator().hasNext()) {
-            ids.add(customers.iterator().next().getId());
-        }
+        customers.stream()
+                .map(c -> ids.add(c.getId()))
+                .collect(Collectors.toSet());
         return ids;
     }
 
