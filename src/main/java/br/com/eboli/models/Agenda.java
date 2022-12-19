@@ -57,7 +57,8 @@ public class Agenda implements Serializable {
     }
 
     public Agenda updateAgenda(AgendaRequest request) {
-        LocalDateTime markedToRequest = DateFormatter.parseDateTime(request.getMarkedTo());
+        LocalDateTime markedToRequest = DateFormatter.parseDateTime(
+                StringFormatter.replaceUnderscoreBySpace(request.getMarkedTo()));
 
         String title = request.getTitle().equals(this.title) ? this.title : request.getTitle();
         String description = request.getDescription().equals(this.description) ? this.description : request.getDescription();
