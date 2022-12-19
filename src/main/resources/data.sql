@@ -18,3 +18,13 @@ INSERT INTO TBL_CONTACTS (TYPE, CONTACT, CUSTOMER_ID) VALUES
   ('EMAIL', 'producao@fapublicidade.com.br', 3),
   ('CELLPHONE', '22 985764503', 4),
   ('PHONE', '11 35268409', 5);
+
+INSERT INTO TBL_AGENDA (TITLE, DESCRIPTION, MARKED_TO, CONCLUDED) VALUES
+  ('Reunião com Kamilly e Marlene Casa Noturna ME', 'Sistema Controle Financeiro', '2023-01-23 15:30:00', FALSE),
+  ('Implantação Fabiana e Jennifer Eletrônica ME', 'Controle Logístico', '2023-02-05 10:25:00', FALSE),
+  ('Reunião com Giovanni e Leandro Adega Ltda', 'Controle de Estoque', '2022-12-20 09:30:00', TRUE);
+
+INSERT INTO TBL_AGENDA_CUSTOMERS (AGENDA_ID, CUSTOMER_ID) VALUES
+  (1, 2),
+  (2, 4),
+  (3, 5);
