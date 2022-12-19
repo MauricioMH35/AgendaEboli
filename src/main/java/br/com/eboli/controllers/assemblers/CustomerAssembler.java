@@ -16,7 +16,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Component
 public class CustomerAssembler {
 
-    public CustomerResponse toModel(CustomerRequest request) {
+    public static CustomerResponse toModel(CustomerRequest request) {
         CustomerResponse response = CustomerResponse.parse(request);
 
         response.add(linkTo(methodOn(CustomerController.class)
@@ -53,7 +53,7 @@ public class CustomerAssembler {
         return response;
     }
 
-    public CustomerResponse toModel(CustomerResponse response) {
+    public static CustomerResponse toModel(CustomerResponse response) {
         response.add(linkTo(methodOn(CustomerController.class)
                 .findById(response.getId())).withSelfRel());
         response.add(linkTo(methodOn(CustomerController.class)
@@ -88,7 +88,7 @@ public class CustomerAssembler {
         return response;
     }
 
-    public CollectionModel<CustomerResponse> toCollectionModel(Iterable<CustomerResponse> responses) {
+    public static CollectionModel<CustomerResponse> toCollectionModel(Iterable<CustomerResponse> responses) {
         for (CustomerResponse response : responses) {
             response.add(linkTo(methodOn(CustomerController.class)
                     .findById(response.getId())).withSelfRel());
