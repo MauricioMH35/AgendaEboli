@@ -4,20 +4,22 @@ import br.com.eboli.models.Customer;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CustomerUtil {
 
     public static Set<Customer> proccessToIds(Set<Long> customerIds) {
         Set<Customer> customers = new HashSet<>();
-        while (customerIds.iterator().hasNext()) {
-            customers.add(Customer.builder()
-                    .id(customerIds.iterator().next())
-                    .fullname(null)
-                    .cnpj(null)
-                    .foundation(null)
-                    .registered(null)
-                    .build());
-        }
+        customerIds.stream()
+                .map(c -> customers.add(Customer.builder()
+                        .id(customerIds.iterator().next())
+                        .fullname(null)
+                        .cnpj(null)
+                        .foundation(null)
+                        .registered(null)
+                        .build()))
+                .collect(Collectors.toList());
+
         return customers;
     }
 

@@ -2,6 +2,7 @@ package br.com.eboli.models;
 
 import br.com.eboli.models.requests.AddressRequest;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @ToString
 @Builder
+@DynamicUpdate
 @Entity
 @Table(name = "tbl_addresses")
 public class Address implements Serializable {
