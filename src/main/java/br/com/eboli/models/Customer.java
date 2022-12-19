@@ -3,6 +3,7 @@ package br.com.eboli.models;
 import br.com.eboli.models.requests.CustomerRequest;
 import br.com.eboli.utils.DateFormatter;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @ToString
 @Builder
+@DynamicUpdate
 @Entity
 @Table(name = "tbl_customers")
 public class Customer implements Serializable {
