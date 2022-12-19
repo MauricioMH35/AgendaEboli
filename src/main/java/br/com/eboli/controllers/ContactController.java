@@ -98,11 +98,13 @@ public class ContactController {
                     "As informações informadas não são validas para realizar a operação.");
         }
 
-        ContactResponse response = ContactResponse.parse(repository.findById(id)
+        Contact updated = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
                         "Não foi possivel encontrar o contato indicado pelo identificador."))
-                .updateContact(request));
-        return ResponseEntity.ok(ContactAssembler.toModel(response));
+                .updateContact(request);
+        repository.save(updated);
+
+        return ResponseEntity.ok(ContactAssembler.toModel(ContactResponse.parse(updated)));
     }
 
     @DeleteMapping("/{id}")

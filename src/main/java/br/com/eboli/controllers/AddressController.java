@@ -2,6 +2,7 @@ package br.com.eboli.controllers;
 
 import br.com.eboli.controllers.assemblers.AddressAssembler;
 import br.com.eboli.exceptions.NotFoundException;
+import br.com.eboli.models.Address;
 import br.com.eboli.models.requests.AddressRequest;
 import br.com.eboli.models.responses.AddressResponse;
 import br.com.eboli.repositories.AddressRepository;
@@ -103,13 +104,13 @@ public class AddressController {
                     "As informações não são validas para proceguir com o processo.");
         }
 
-        AddressResponse response = AddressResponse.parse(
-                repository.findById(id)
+        Address updated = repository.findById(id)
                         .orElseThrow(() -> new NotFoundException(
                                 "Não foi possivel encontrar o endereço indicado pelo identificador."))
-                        .updateAddress(request));
+                        .updateAddress(request);
+        repository.save(updated);
 
-        return ResponseEntity.ok(AddressAssembler.toModel(response));
+        return ResponseEntity.ok(AddressAssembler.toModel(AddressResponse.parse(updated)));
     }
 
     @DeleteMapping("{id}")

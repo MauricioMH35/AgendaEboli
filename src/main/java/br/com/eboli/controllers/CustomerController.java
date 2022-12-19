@@ -128,12 +128,13 @@ public class CustomerController {
                     "As informações passdas são invalidas.");
         }
 
-        Customer customer = repository.findById(id)
+        Customer updated = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
                         "Não foi possivel encontrar o cliente com identificado."))
                 .updateCustomer(request);
+        repository.save(updated);
 
-        return ResponseEntity.ok(hateoas.toModel(CustomerResponse.parse(customer)));
+        return ResponseEntity.ok(hateoas.toModel(CustomerResponse.parse(updated)));
     }
 
     @DeleteMapping("/{id}")
