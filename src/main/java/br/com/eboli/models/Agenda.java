@@ -1,8 +1,11 @@
 package br.com.eboli.models;
 
 import br.com.eboli.models.requests.AgendaRequest;
+import br.com.eboli.models.utils.CustomerUtil;
 import br.com.eboli.utils.DateFormatter;
+import br.com.eboli.utils.StringFormatter;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,6 +19,7 @@ import java.util.Set;
 @EqualsAndHashCode
 @ToString
 @Builder
+@DynamicUpdate
 @Entity
 @Table(name = "tbl_agenda")
 public class Agenda implements Serializable {
