@@ -3,6 +3,7 @@ package br.com.eboli.models;
 import br.com.eboli.models.enums.ContactType;
 import br.com.eboli.models.requests.ContactRequest;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,6 +14,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @ToString
 @Builder
+@DynamicUpdate
 @Entity
 @Table(name = "tbl_contacts")
 public class Contact implements Serializable {
