@@ -26,7 +26,7 @@ public class Agenda implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private final Long id;
 
-    @Column(length = 32, nullable = false)
+    @Column(length = 128, nullable = false)
     private final String title;
 
     @Column
