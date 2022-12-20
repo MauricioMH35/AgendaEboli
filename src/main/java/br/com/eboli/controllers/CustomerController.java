@@ -29,6 +29,7 @@ import static br.com.eboli.utils.StringFormatter.replaceUnderscoreBySpace;
 public class CustomerController {
 
     private final CustomerRepository repository;
+    private final CustomerService service;
 
     @PostMapping
     public ResponseEntity<CustomerResponse> save(@RequestBody CustomerRequest request) {
