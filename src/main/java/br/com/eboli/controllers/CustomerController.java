@@ -1,11 +1,11 @@
 package br.com.eboli.controllers;
 
-import br.com.eboli.controllers.assemblers.CustomerAssembler;
 import br.com.eboli.exceptions.NotFoundException;
 import br.com.eboli.models.Customer;
 import br.com.eboli.models.requests.CustomerRequest;
 import br.com.eboli.models.responses.CustomerResponse;
 import br.com.eboli.repositories.CustomerRepository;
+import br.com.eboli.services.CustomerService;
 import br.com.eboli.utils.DateFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
