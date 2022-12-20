@@ -55,16 +55,10 @@ public class CustomerController {
 
     @GetMapping("/cnpj/{cnpj}")
     public ResponseEntity<CustomerResponse> findByCnpj(@PathVariable String cnpj) {
-        if (cnpj == null) {
-            throw new IllegalArgumentException(
-                    "O CNPJ informado não é válido.");
-        }
-
-        CustomerResponse response = CustomerResponse.parse(repository.findByCnpj(cnpj)
-                .orElseThrow(() -> new NotFoundException(
-                        "Não foi possivel encontrar o cliente indicado pelo CNPJ.")));
-
-        return ResponseEntity.ok(toModel(response));
+        System.out.println("cnpj: " + cnpj);
+        return ResponseEntity.ok(
+                toModel(service.findByCnpj(cnpj))
+        );
     }
 
     @GetMapping("/find")
