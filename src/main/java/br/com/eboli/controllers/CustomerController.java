@@ -68,9 +68,9 @@ public class CustomerController {
                     "Deve-se informar os dados que serão usados para encontrar o cliente.");
         }
 
-        CollectionModel<CustomerResponse> responses = null;
+        Iterable<CustomerResponse> responses;
         if (params.containsKey("name")) {
-            responses = findByNameContains(params.get("name"));
+            responses = service.findByNameContains(params.get("name"));
 
         } else if (params.containsKey("foundation")) {
             responses = findByFoundation(params.get("foundation"));
