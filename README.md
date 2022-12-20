@@ -17,7 +17,6 @@ Projeto de teste para vaga de estágio na Éboli.
 <p align="justify">
 Este projeto realiza a marcação de eventos em uma agenda que deve facilitar o gerenciamento em diversas plataformas. Sendo assim, o projeto está sendo desenvolvido para oferecer uma REST API, para que as diversas modalidades de uso, possam consumir por meio desta API as informações, além de também informá-las.
 
-<<<<<<< HEAD
 A linguagem de programação utilizada para o desenvolvimento dessa tecnologia foi o Java, com o uso do Spring Boot, que tem como objetivo a facilitação de organizar e prover as dependências necessárias para a construção do projeto com o Maven.
 
 As __Entidade__ e seus relacionamentos para a construção da Agenda Éboli podem ser visualizadas na figura a seguir:
