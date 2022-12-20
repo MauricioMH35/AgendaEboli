@@ -48,16 +48,9 @@ public class CustomerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CustomerResponse> findById(@PathVariable Long id) {
-        if (id.equals(null)) {
-            throw new IllegalArgumentException(
-                    "O identificador deve ser informado para realizar a operação.");
-        }
-
-        CustomerResponse response = CustomerResponse.parse(repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        "Não foi possivel encontrar o cliente indicado pelo identificador."))
+        return ResponseEntity.ok(
+                toModel(service.findById(id))
         );
-        return ResponseEntity.ok(toModel(response));
     }
 
     @GetMapping("/cnpj/{cnpj}")
