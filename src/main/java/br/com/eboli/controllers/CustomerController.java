@@ -127,46 +127,6 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
-    private CollectionModel<CustomerResponse> findByNameContains(String name) {
-        if (name != null) {
-            String changeName = replaceUnderscoreBySpace(name);
-            Iterable<CustomerResponse> responses = repository
-                    .findByFullnameContains(changeName).stream()
-                        .map(c -> CustomerResponse.parse(c))
-                        .collect(Collectors.toList());
-
-            if (!responses.iterator().hasNext()) {
-                throw new NotFoundException(
-                        "Não foi possivel encontrar clientes que contenham o nome indicado.");
-            }
-
-            return CollectionModel.of(responses);
-
-        } else {
-            throw new IllegalArgumentException(
-                    "O nome informado não é valido para realizar a operação de busca.");
-        }
-    }
-
-    private CollectionModel<CustomerResponse> findByFoundation(String foundation) {
-        if (foundation != "" && checkDatePattern(foundation)) {
-            Iterable<CustomerResponse> responses = repository.findByFoundation(DateFormatter.parseDate(foundation)).stream()
-                    .map(c -> CustomerResponse.parse(c))
-                    .collect(Collectors.toList());
-
-            if (!responses.iterator().hasNext()) {
-                throw new NotFoundException(
-                        "Não foi possivel encontrar clientes com data de fundação indicada.");
-            }
-
-            return CollectionModel.of(responses);
-
-        } else {
-            throw new IllegalArgumentException(
-                    "A data de fundação do cliente não é válida.");
-        }
-    }
-
     private CollectionModel<CustomerResponse> findByFoundationBetween(
             String startTarget, String endTarget) {
         boolean checkIsValid =
