@@ -40,14 +40,10 @@ public class CustomerController {
 
     @GetMapping
     public ResponseEntity<CollectionModel<CustomerResponse>> findAll() {
-        Iterable<CustomerResponse> responses = repository.findAll().stream()
-                .map(c -> CustomerResponse.parse(c))
-                .collect(Collectors.toList());
-        if (!responses.iterator().hasNext()) {
-            throw new NotFoundException("Não foi possivel encontrar clientes cadastrados.");
-        }
-
-        return ResponseEntity.ok(toCollectionModel(responses));
+        Iterable<CustomerResponse> responses = service.findAll();
+        return ResponseEntity.ok(
+                toCollectionModel(responses)
+        );
     }
 
     @GetMapping("/{id}")
