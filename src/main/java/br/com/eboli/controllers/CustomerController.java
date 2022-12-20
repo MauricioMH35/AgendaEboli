@@ -33,18 +33,9 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<CustomerResponse> save(@RequestBody CustomerRequest request) {
-        if (request.equals(new CustomerRequest()) || request.equals(null)) {
-            throw new IllegalArgumentException(
-                    "As informações do cliente devem ser informadas para proceguir com o cadastro.");
-        }
-        if (repository.findByCnpj(request.getCnpj()).isPresent()) {
-            throw new IllegalArgumentException(
-                    "Não é possível cadastrar o mesmo cliente.");
-        }
-
-        Long id = repository.save(CustomerRequest.parseToModel(request)).getId();
-        request.setId(id);
-        return ResponseEntity.ok(toModel(request));
+        return ResponseEntity.ok(
+                toModel(service.save(request))
+        );
     }
 
     @GetMapping
