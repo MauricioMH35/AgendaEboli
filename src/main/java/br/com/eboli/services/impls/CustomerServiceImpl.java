@@ -180,4 +180,33 @@ public class CustomerServiceImpl implements CustomerService {
         return responses;
     }
 
+    @Override
+    public Iterable<CustomerResponse> findByRegisteredBetween(String startTarget, String endTarget) {
+        boolean checkIsValid =
+                startTarget != null &&
+                        endTarget != null &&
+                        checkDateTimePattern(startTarget) &&
+                        checkDateTimePattern(endTarget);
+        if (!checkIsValid) {
+            throw new IllegalArgumentException(
+                    "As datas de registro não são validas.");
+        }
+
+        LocalDateTime registeredStart = parseDateTime(replaceUnderscoreBySpace(startTarget));
+        LocalDateTime registeredEnd = parseDateTime(replaceUnderscoreBySpace(endTarget));
+
+        Iterable<CustomerResponse> responses = repository.findByRegisteredBetween(
+                        registeredStart, registeredEnd
+                ).stream()
+                .map(c -> CustomerResponse.parse(c))
+                .collect(Collectors.toList());
+
+        if (!responses.iterator().hasNext()) {
+            throw new NotFoundException(
+                    "Não foi encontrado clientes registrado entre as datas indicadas.");
+        }
+
+        return responses;
+    }
+
 }

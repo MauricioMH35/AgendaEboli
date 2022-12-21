@@ -87,9 +87,9 @@ public class CustomerController {
             responses = service.findByRegistered(registered);
 
         } else if (params.containsKey("registered-start") && params.containsKey("registered-end")) {
-            responses = findByRegisteredBetween(
-                    params.get("registered-start"),
-                    params.get("registered-end"));
+            String registeredStart = params.get("registered-start");
+            String registeredEnd = params.get("registered-end");
+            responses = service.findByRegisteredBetween(registeredStart, registeredEnd);
 
         } else {
             throw new IllegalArgumentException(
