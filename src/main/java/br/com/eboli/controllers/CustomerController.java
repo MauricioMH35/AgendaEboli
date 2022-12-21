@@ -74,7 +74,8 @@ public class CustomerController {
             responses = service.findByNameContains(name);
 
         } else if (params.containsKey("foundation")) {
-            responses = service.findByFoundation(params.get("foundation"));
+            String foundation = params.get("foundation");
+            responses = service.findByFoundation(foundation);
 
         } else if (params.containsKey("foundation-start") && params.containsKey("foundation-end")) {
             responses = findByFoundationBetween(
