@@ -37,7 +37,7 @@ public class DateFormatter {
     }
 
     public static Boolean checkDateTimePattern(String target) {
-        final String regex = "(\\d{4})[^-\\/\\\\\\s](\\d{2})[^-\\/\\\\\\s](\\d{2})[^-\\/\\\\\\s](\\d{2})[^-\\/\\\\\\s](\\d{2})[^-\\/\\\\\\s](\\d{2})";
+        final String regex = "(\\d{4})[^-\\/\\\\\\s](\\d{2})[^-\\/\\\\\\s](\\d{2})[^-\\/\\\\\\s](\\d{2})[^\\/\\\\\\s](\\d{2})[^\\/\\\\\\s](\\d{2})";
         final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
         final Matcher matcher = pattern.matcher(target);
         return matcher.find();
