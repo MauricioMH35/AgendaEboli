@@ -157,4 +157,27 @@ public class CustomerServiceImpl implements CustomerService {
         return responses;
     }
 
+    @Override
+    public Iterable<CustomerResponse> findByRegistered(String target) {
+        boolean checkIsValid = target != null && checkDateTimePattern(target);
+
+        if (!checkIsValid) {
+            throw new IllegalArgumentException(
+                    "A data de registro informada não é valida");
+        }
+
+        LocalDateTime registerd = DateFormatter.parseDateTime(replaceUnderscoreBySpace(target));
+        Iterable<CustomerResponse> responses = repository.findByRegistered(registerd)
+                .stream()
+                .map(c -> CustomerResponse.parse(c))
+                .collect(Collectors.toList());
+
+        if (!responses.iterator().hasNext()) {
+            throw new NotFoundException(
+                    "Não é possivel encontrar clientes registrados na data indicada.");
+        }
+
+        return responses;
+    }
+
 }

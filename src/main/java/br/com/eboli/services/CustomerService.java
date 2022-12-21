@@ -14,5 +14,6 @@ public interface CustomerService {
     Iterable<CustomerResponse> findByNameContains(String name);
     Iterable<CustomerResponse> findByFoundation(String foundation);
     Iterable<CustomerResponse> findByFoundationBetween(String startTarget, String endTarget);
+    Iterable<CustomerResponse> findByRegistered(String target);
 
 }
