@@ -9,13 +9,15 @@ import br.com.eboli.services.CustomerService;
 import br.com.eboli.utils.DateFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static br.com.eboli.utils.DateFormatter.checkDatePattern;
+import static br.com.eboli.utils.DateFormatter.*;
 import static br.com.eboli.utils.StringFormatter.replaceUnderscoreBySpace;
 
 @Component
@@ -122,6 +124,34 @@ public class CustomerServiceImpl implements CustomerService {
         if (!responses.iterator().hasNext()) {
             throw new NotFoundException(
                     "Não foi possivel encontrar clientes com data de fundação indicada.");
+        }
+
+        return responses;
+    }
+
+    @Override
+    public Iterable<CustomerResponse> findByFoundationBetween(String startTarget, String endTarget) {
+        boolean checkIsValid = startTarget != null &&
+                        endTarget != null &&
+                        checkDatePattern(startTarget) &&
+                        checkDatePattern(endTarget);
+
+        if (!checkIsValid) {
+            throw new IllegalArgumentException(
+                    "As datas de fundação não são validas.");
+        }
+
+        Iterable<CustomerResponse> responses;
+        responses = repository.findByFoundationBetween(
+                        DateFormatter.parseDate(startTarget),
+                        DateFormatter.parseDate(endTarget)
+                ).stream()
+                .map(c -> CustomerResponse.parse(c))
+                .collect(Collectors.toList());
+
+        if (!responses.iterator().hasNext()) {
+            throw new NotFoundException(
+                    "Não foi possivel encontrar clientes entre as datas de fundação.");
         }
 
         return responses;

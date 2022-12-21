@@ -13,5 +13,6 @@ public interface CustomerService {
     CustomerResponse findByCnpj(String cnpj);
     Iterable<CustomerResponse> findByNameContains(String name);
     Iterable<CustomerResponse> findByFoundation(String foundation);
+    Iterable<CustomerResponse> findByFoundationBetween(String startTarget, String endTarget);
 
 }
