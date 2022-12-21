@@ -70,7 +70,8 @@ public class CustomerController {
 
         Iterable<CustomerResponse> responses;
         if (params.containsKey("name")) {
-            responses = service.findByNameContains(params.get("name"));
+            String name = params.get("name");
+            responses = service.findByNameContains(name);
 
         } else if (params.containsKey("foundation")) {
             responses = service.findByFoundation(params.get("foundation"));
