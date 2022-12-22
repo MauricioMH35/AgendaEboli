@@ -18,5 +18,6 @@ public interface CustomerService {
     Iterable<CustomerResponse> findByRegistered(String target);
     Iterable<CustomerResponse> findByRegisteredBetween(String startTarget, String endTarget);
     CustomerResponse updateById(Long id, CustomerRequest request);
+    void deleteById(@PathVariable Long id);
 
 }

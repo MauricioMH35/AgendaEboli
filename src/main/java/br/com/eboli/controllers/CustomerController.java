@@ -109,15 +109,8 @@ public class CustomerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity deleteById(@PathVariable Long id) {
-        if (id.equals(null)) {
-            throw new IllegalArgumentException(
-                    "O identificado informado não é valido.");
-        }
+        service.deleteById(id);
 
-        Customer found = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        "Não foi possivel encontrar o cliente com o identificador informado."));
-        repository.delete(found);
         return ResponseEntity.noContent().build();
     }
 

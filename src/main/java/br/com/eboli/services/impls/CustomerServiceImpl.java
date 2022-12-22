@@ -226,4 +226,22 @@ public class CustomerServiceImpl implements CustomerService {
         );
         return CustomerResponse.parse(saved);
     }
+
+    @Override
+    public void deleteById(@PathVariable Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException(
+                    "O identificado informado não é valido.");
+        }
+
+        Customer found = findByIdBasic(id);
+        repository.delete(found);
+    }
+
+    private Customer findByIdBasic(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new NotFoundException(
+                        "Não foi possivel encontrar o cliente indicado pelo identificador."));
+    }
+
 }
