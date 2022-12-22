@@ -3,6 +3,7 @@ package br.com.eboli.services;
 import br.com.eboli.models.requests.CustomerRequest;
 import br.com.eboli.models.responses.CustomerResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public interface CustomerService {
@@ -16,5 +17,6 @@ public interface CustomerService {
     Iterable<CustomerResponse> findByFoundationBetween(String startTarget, String endTarget);
     Iterable<CustomerResponse> findByRegistered(String target);
     Iterable<CustomerResponse> findByRegisteredBetween(String startTarget, String endTarget);
+    CustomerResponse updateById(Long id, CustomerRequest request);
 
 }

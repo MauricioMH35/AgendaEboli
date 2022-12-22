@@ -102,18 +102,9 @@ public class CustomerController {
     @PutMapping("/{id}")
     public ResponseEntity<CustomerResponse> updateById(@PathVariable Long id,
                                                        @RequestBody CustomerRequest request) {
-        if (id.equals(null) || request.equals(new CustomerRequest())) {
-            throw new IllegalArgumentException(
-                    "As informações passdas são invalidas.");
-        }
-
-        Customer updated = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        "Não foi possivel encontrar o cliente com identificado."))
-                .updateCustomer(request);
-        repository.save(updated);
-
-        return ResponseEntity.ok(toModel(CustomerResponse.parse(updated)));
+        return ResponseEntity.ok(
+                toModel(service.updateById(id, request))
+        );
     }
 
     @DeleteMapping("/{id}")

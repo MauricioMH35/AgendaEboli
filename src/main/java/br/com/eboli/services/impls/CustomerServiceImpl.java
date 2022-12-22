@@ -2,6 +2,7 @@ package br.com.eboli.services.impls;
 
 import br.com.eboli.exceptions.ConflictException;
 import br.com.eboli.exceptions.NotFoundException;
+import br.com.eboli.models.Customer;
 import br.com.eboli.models.requests.CustomerRequest;
 import br.com.eboli.models.responses.CustomerResponse;
 import br.com.eboli.repositories.CustomerRepository;
@@ -10,7 +11,10 @@ import br.com.eboli.utils.DateFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
@@ -209,4 +213,17 @@ public class CustomerServiceImpl implements CustomerService {
         return responses;
     }
 
+    @Override
+    public CustomerResponse updateById(Long id, CustomerRequest request) {
+        if (id == null || request.equals(new CustomerRequest())) {
+            throw new IllegalArgumentException(
+                    "As informações passdas são invalidas.");
+        }
+
+        Customer saved = repository.save(
+                findByIdBasic(id)
+                        .updateCustomer(request)
+        );
+        return CustomerResponse.parse(saved);
+    }
 }
