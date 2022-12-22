@@ -69,12 +69,7 @@ public class CustomerServiceImpl implements CustomerService {
                     "O identificador deve ser informado para realizar a operação.");
         }
 
-        CustomerResponse response = CustomerResponse.parse(repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        "Não foi possivel encontrar o cliente indicado pelo identificador."))
-        );
-
-        return response;
+        return CustomerResponse.parse(findByIdBasic(id));
     }
 
     @Override
