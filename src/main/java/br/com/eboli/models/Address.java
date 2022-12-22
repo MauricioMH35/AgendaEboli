@@ -45,7 +45,10 @@ public class Address implements Serializable {
     @Column(nullable = false, length = 14)
     private final String zipCode;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 

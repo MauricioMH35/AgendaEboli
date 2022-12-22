@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Data
 @EqualsAndHashCode
 @ToString
@@ -37,6 +38,9 @@ public class Customer implements Serializable {
 
     @Column
     private final LocalDateTime registered;
+
+    @OneToOne(mappedBy = "customer")
+    private Address address;
 
     private Customer() {
         this.id = null;
