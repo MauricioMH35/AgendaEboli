@@ -1,7 +1,6 @@
 package br.com.eboli.repositories;
 
 import br.com.eboli.models.Contact;
-import br.com.eboli.models.Customer;
 import br.com.eboli.models.enums.ContactType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
