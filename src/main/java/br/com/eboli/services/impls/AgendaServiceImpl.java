@@ -36,7 +36,7 @@ public class AgendaServiceImpl implements AgendaService {
     @Qualifier("agendaRepository")
     private final AgendaRepository repository;
 
-    private final Clock clock;
+    private final Clock clock = Clock.system(ZoneId.of("America/Sao_Paulo"));
 
     @Override
     public AgendaRequest save(AgendaRequest request) {
