@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
-
-    Optional<Customer> findByCnpj(String cnpj);
+public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
     List<Customer> findByFullnameContains(String fullname);
+
+    Optional<Customer> findByCnpj(String cnpj);
 
     List<Customer> findByFoundation(LocalDate foundation);
 

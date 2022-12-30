@@ -1,138 +1,100 @@
 package br.com.eboli.controllers;
 
-import br.com.eboli.controllers.assemblers.ContactAssembler;
-import br.com.eboli.exceptions.NotFoundException;
-import br.com.eboli.models.Contact;
-import br.com.eboli.models.Customer;
-import br.com.eboli.models.enums.ContactType;
 import br.com.eboli.models.requests.ContactRequest;
 import br.com.eboli.models.responses.ContactResponse;
-import br.com.eboli.repositories.ContactRepository;
+import br.com.eboli.services.ContactService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Locale;
-import java.util.stream.Collectors;
+import static br.com.eboli.controllers.assemblers.ContactAssembler.toCollection;
+import static br.com.eboli.controllers.assemblers.ContactAssembler.toModel;
 
+@Scope("singleton")
 @RestController
 @RequestMapping("/v1/api/contacts")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@CrossOrigin(origins = {"*"}, maxAge = 3600)
 public class ContactController {
 
-    private final ContactRepository repository;
+    private Logger log = LoggerFactory.getLogger(ContactController.class);
+
+    @Qualifier("contactServiceImpl") private final ContactService service;
 
     @PostMapping
     public ResponseEntity<ContactResponse> save(@RequestBody ContactRequest request) {
-        if (request.equals(new ContactRequest())) {
-            throw new IllegalArgumentException(
-                    "As informaçãoes do contato não são validas.");
-        }
-        if (repository.findByContact(request.getContact()).isPresent()) {
-            throw new IllegalArgumentException(
-                    "Contata já cadastrado.");
-        }
-
-        Long id = repository.save(ContactRequest.parseToModel(request)).getId();
-        request.setId(id);
-        return ResponseEntity.ok(ContactResponse.parse(request));
+        return ResponseEntity.ok(
+                toModel(
+                        service.save(request)
+                )
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ContactResponse> findById(@PathVariable Long id) {
-        if (id.equals(null)) {
-            throw new IllegalArgumentException(
-                    "O identificador deve ser informado para proceguir com o processo.");
-        }
+    public ResponseEntity<ContactResponse> findById(@PathVariable Integer id) {
+        return ResponseEntity.ok(
+                toModel(
+                        service.findById(id)
+                )
+        );
+    }
 
-        ContactResponse response = ContactResponse.parse(repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        "Não foi possivel encontrar o contato com o identificador informado.")));
-        return ResponseEntity.ok(ContactAssembler.toModel(response));
+    @GetMapping
+    public ResponseEntity<CollectionModel<ContactResponse>> findAll() {
+        return ResponseEntity.ok(
+                toCollection(
+                        service.findAll()
+                )
+        );
+    }
+
+    @GetMapping("/contact/{contact}")
+    public ResponseEntity<ContactResponse> findByContact(@PathVariable String contact) {
+        return ResponseEntity.ok(
+                toModel(
+                        service.findByContact(contact)
+                )
+        );
     }
 
     @GetMapping("/type/{type}")
-    public ResponseEntity<CollectionModel<ContactResponse>> findByContactType(@PathVariable String type) {
-        ContactType checkedType = checkIsContactType(type);
-        if (checkedType == null) {
-            throw new IllegalArgumentException(
-                    "O tipo de contato informado não é valido.");
-        }
-
-        Iterable<ContactResponse> responses = repository.findByType(checkedType).stream()
-                .map(c -> ContactResponse.parse(c))
-                .collect(Collectors.toList());
-
-        if (!responses.iterator().hasNext()) {
-            throw new NotFoundException(
-                    "Não foi possible to econtrar contacts com type.");
-        }
-        return ResponseEntity.ok(ContactAssembler.toCollectionModel(responses));
+    public ResponseEntity<CollectionModel<ContactResponse>> findByType(@PathVariable String type) {
+        return ResponseEntity.ok(
+                toCollection(
+                        service.findByType(type)
+                )
+        );
     }
 
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<CollectionModel<ContactResponse>> findByCustomerId(@PathVariable Long customerId) {
-        if (customerId.equals(null)) {
-            throw new IllegalArgumentException(
-                    "O identificador do cliente não valido para realizar a busca de seus contatos.");
-        }
-
-        Iterable<ContactResponse> responses = repository.findByCustomerId(customerId).stream()
-                .map(c -> ContactResponse.parse(c))
-                .collect(Collectors.toList());
-        if (!responses.iterator().hasNext()) {
-            throw new NotFoundException(
-                    "Não foi possivel encontrar contatos do cliente indicado.");
-        }
-
-        return ResponseEntity.ok(ContactAssembler.toCollectionModel(responses));
+    public ResponseEntity<CollectionModel<ContactResponse>> findByCustomerId(@PathVariable Integer customerId) {
+        return ResponseEntity.ok(
+                toCollection(
+                        service.findByCustomerId(customerId)
+                )
+        );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ContactResponse> updateById(@PathVariable Long id,
+    public ResponseEntity<ContactResponse> updateById(@PathVariable Integer id,
                                                       @RequestBody ContactRequest request) {
-        if (id.equals(null) || request.equals(new ContactRequest())) {
-            throw new IllegalArgumentException(
-                    "As informações informadas não são validas para realizar a operação.");
-        }
-
-        Contact updated = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        "Não foi possivel encontrar o contato indicado pelo identificador."))
-                .updateContact(request);
-        repository.save(updated);
-
-        return ResponseEntity.ok(ContactAssembler.toModel(ContactResponse.parse(updated)));
+        return ResponseEntity.ok(
+                toModel(
+                        service.updateById(id, request)
+                )
+        );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ContactResponse> deleteById(@PathVariable Long id) {
-        if (id.equals(null)) {
-            throw new IllegalArgumentException(
-                    "O identificador não é valido.");
-        }
-
-        Contact found = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(
-                        "Não foi possivel localizar o contato indicado por seu identificador."));
-        repository.delete(found);
+    public ResponseEntity<ContactResponse> deleteById(@PathVariable Integer id) {
+        service.deleteById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    private ContactType checkIsContactType(String target) {
-        if (target.equals("") || target.equals(null)) {
-            return null;
-        }
-
-        for (ContactType type : ContactType.values()) {
-            boolean checkEqualsLowerCase = type.toString().equalsIgnoreCase(target);
-            if (checkEqualsLowerCase) {
-                return type;
-            }
-        }
-        return null;
     }
 
 }

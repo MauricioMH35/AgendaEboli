@@ -1,23 +1,24 @@
 package br.com.eboli.services;
 
 import br.com.eboli.models.requests.CustomerRequest;
-import br.com.eboli.models.responses.CustomerResponse;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
-@Service
+import java.util.List;
+import java.util.Map;
+
 public interface CustomerService {
 
-    CustomerResponse save(CustomerRequest request);
-    Iterable<CustomerResponse> findAll();
-    CustomerResponse findById(Long id);
-    CustomerResponse findByCnpj(String cnpj);
-    Iterable<CustomerResponse> findByNameContains(String name);
-    Iterable<CustomerResponse> findByFoundation(String foundation);
-    Iterable<CustomerResponse> findByFoundationBetween(String startTarget, String endTarget);
-    Iterable<CustomerResponse> findByRegistered(String target);
-    Iterable<CustomerResponse> findByRegisteredBetween(String startTarget, String endTarget);
-    CustomerResponse updateById(Long id, CustomerRequest request);
-    void deleteById(@PathVariable Long id);
+    CustomerRequest save(CustomerRequest request);
+
+    CustomerRequest findById(Integer id);
+
+    CustomerRequest findByCnpj(String cnpj);
+
+    List<CustomerRequest> findAll();
+
+    List<CustomerRequest> find(Map<String, String> params);
+
+    CustomerRequest updateById(Integer id, CustomerRequest request);
+
+    void deleteById(Integer id);
 
 }

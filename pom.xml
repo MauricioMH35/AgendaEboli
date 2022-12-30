@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>br.com.eboli</groupId>
-    <artifactId>EboliAgenda</artifactId>
+    <artifactId>AgendaEboli</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

@@ -6,13 +6,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-@Transactional
-public interface AgendaRepository extends JpaRepository<Agenda, Long> {
+public interface AgendaRepository extends JpaRepository<Agenda, Integer> {
 
     List<Agenda> findByTitleContains(String title);
 
@@ -23,7 +21,11 @@ public interface AgendaRepository extends JpaRepository<Agenda, Long> {
     List<Agenda> findByConcluded(Boolean concluded);
 
     @Modifying
+    @Query("SELECT a FROM Agenda a WHERE a.customer.id=?1")
+    List<Agenda> findByCustomerId(Integer customerId);
+
+    @Modifying
     @Query("UPDATE Agenda a SET a.concluded=true WHERE a.id=?1")
-    void markConcluded(Long id);
+    void markConcluded(Integer id);
 
 }

@@ -1,19 +1,20 @@
 package br.com.eboli.models;
 
 import br.com.eboli.models.enums.ContactType;
-import br.com.eboli.models.requests.ContactRequest;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
-@RequiredArgsConstructor
 @AllArgsConstructor
-@Data
+@RequiredArgsConstructor
+@Getter
+@Setter
 @EqualsAndHashCode
 @ToString
 @Builder
+
 @DynamicUpdate
 @Entity
 @Table(name = "tbl_contacts")
@@ -23,32 +24,40 @@ public class Contact implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long id;
+    private final Integer id;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
-    private final ContactType type;
+    @Enumerated(EnumType.STRING)
+    private ContactType type;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private final String contact;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "customer_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private Customer customer;
 
-    private Contact() {
+    public Contact() {
         this.id = null;
         this.type = null;
         this.contact = null;
     }
 
-    public Contact updateContact(ContactRequest request) {
-        ContactType type = request.getType() != this.type ? request.getType() : this.type;
-        String contact = request.getContact() != this.contact ? request.getContact() : this.contact;
-        Customer customer = Customer.builder().id(request.getCustomerId()).build();
+    public Contact update(Contact updated) {
+        ContactType type =
+                getType().compareTo(updated.getType()) == 0 ?
+                        getType() : updated.getType();
+
+        String contact =
+                getContact().compareTo(updated.getContact()) == 0 ?
+                        getContact() : updated.getContact();
+
+        Customer customer =
+                getCustomer().equals(updated.getCustomer()) ?
+                        getCustomer() : updated.getCustomer();
 
         return Contact.builder()
-                .id(this.id)
+                .id(getId())
                 .type(type)
                 .contact(contact)
                 .customer(customer)

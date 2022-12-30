@@ -1,22 +1,28 @@
 package br.com.eboli.models;
 
-import br.com.eboli.models.requests.CustomerRequest;
-import br.com.eboli.utils.DateFormatter;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode
 @ToString
 @Builder
+
 @DynamicUpdate
+@DynamicInsert
 @Entity
 @Table(name = "tbl_customers")
 public class Customer implements Serializable {
@@ -25,24 +31,32 @@ public class Customer implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long id;
+    private final Integer id;
 
-    @Column(length = 64, nullable = false)
+    @Column(unique = true, length = 128, nullable = false)
     private final String fullname;
 
-    @Column(length = 14, unique = true, nullable = false)
+    @Column(unique = true, length = 14, nullable = false)
     private final String cnpj;
 
-    @Column
+    @Column(nullable = false)
     private final LocalDate foundation;
 
     @Column
     private final LocalDateTime registered;
 
-    @OneToOne(mappedBy = "customer")
-    private Address address;
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Address> addresses = new HashSet<>();
 
-    private Customer() {
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Contact> contacts = new HashSet<>();
+
+    @OneToMany(mappedBy = "customer")
+    private Set<Agenda> agenda = new HashSet<>();
+
+    public Customer() {
         this.id = null;
         this.fullname = null;
         this.cnpj = null;
@@ -50,21 +64,22 @@ public class Customer implements Serializable {
         this.registered = null;
     }
 
-    public Customer updateCustomer(CustomerRequest request) {
-        LocalDate foundationRequest = DateFormatter.parseDate(request.getFoundation());
-        LocalDateTime registeredRequest = DateFormatter.parseDateTime(request.getRegistered());
+    public Customer update(Customer updated) {
+        String fullname = getFullname().compareTo(updated.getFullname()) == 0 ?
+                getFullname() : updated.getFullname();
 
-        String fullname = request.getFullname() != this.fullname ? request.getFullname() : this.fullname;
-        String cnpj = request.getCnpj() != this.cnpj ? request.getCnpj() : this.cnpj;
-        LocalDate foundation = foundationRequest != this.foundation ? foundationRequest : this.foundation;
-        LocalDateTime registered = registeredRequest != this.registered ? registeredRequest : this.registered;
+        String cnpj = getCnpj().compareTo(updated.getCnpj()) == 0 ?
+                getCnpj() : updated.getCnpj();
+
+        LocalDate foundation = getFoundation().compareTo(updated.getFoundation()) == 0 ?
+                getFoundation() : updated.getFoundation();
 
         return Customer.builder()
                 .id(this.id)
                 .fullname(fullname)
                 .cnpj(cnpj)
                 .foundation(foundation)
-                .registered(registered)
+                .registered(this.registered)
                 .build();
     }
 

@@ -3,121 +3,57 @@ package br.com.eboli.models.responses;
 import br.com.eboli.models.Address;
 import br.com.eboli.models.Customer;
 import br.com.eboli.models.requests.AddressRequest;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Data
+@EqualsAndHashCode
+@ToString
 @Builder
-public class AddressResponse  extends RepresentationModel<AddressResponse> {
+public class AddressResponse extends RepresentationModel<AddressResponse> implements Serializable {
 
-    private Long id;
-    private String publicPlace;
-    private Integer number;
-    private String complement;
-    private String neighborhood;
-    private String city;
-    private String state;
-    private String zipCode;
-    private Long customerId;
+    public static final long serialVersionUID = 1l;
 
-    public Address parseToModel() {
+    @JsonProperty private Integer id;
+    @JsonProperty private String publicPlace;
+    @JsonProperty private Integer number;
+    @JsonProperty private String complement;
+    @JsonProperty private String neighborhood;
+    @JsonProperty private String city;
+    @JsonProperty private String state;
+    @JsonProperty private String zipCode;
+    @JsonProperty private Integer customerId;
+
+    public Address parse() {
         return Address.builder()
-                .id(this.id)
-                .publicPlace(this.publicPlace)
-                .number(this.number)
-                .complement(this.complement)
-                .neighborhood(this.neighborhood)
-                .city(this.city)
-                .state(this.state)
-                .zipCode(this.zipCode)
-                .customer(Customer.builder()
-                        .id(this.customerId)
-                        .fullname(null)
-                        .cnpj(null)
-                        .foundation(null)
-                        .registered(null)
-                        .build())
+                .id(id)
+                .publicPlace(publicPlace)
+                .number(number)
+                .complement(complement)
+                .neighborhood(neighborhood)
+                .city(city)
+                .state(state)
+                .zipCode(zipCode)
+                .customer(Customer.builder().id(customerId).build())
                 .build();
     }
 
     public AddressRequest parseToRequest() {
         return AddressRequest.builder()
-                .id(this.id)
-                .publicPlace(this.publicPlace)
-                .number(this.number)
-                .complement(this.complement)
-                .neighborhood(this.neighborhood)
-                .city(this.city)
-                .state(this.state)
-                .zipCode(this.zipCode)
-                .customerId(this.customerId)
-                .build();
-    }
-
-    public static Address parseToModel(AddressResponse response) {
-        return Address.builder()
-                .id(response.getId())
-                .publicPlace(response.getPublicPlace())
-                .number(response.getNumber())
-                .complement(response.getComplement())
-                .neighborhood(response.getNeighborhood())
-                .city(response.getCity())
-                .state(response.getState())
-                .zipCode(response.getZipCode())
-                .customer(Customer.builder()
-                        .id(response.getCustomerId())
-                        .fullname(null)
-                        .cnpj(null)
-                        .foundation(null)
-                        .registered(null)
-                        .build())
-                .build();
-    }
-
-    public static AddressRequest parseToRequest(AddressResponse response) {
-        return AddressRequest.builder()
-                .id(response.getId())
-                .publicPlace(response.getPublicPlace())
-                .number(response.getNumber())
-                .complement(response.getComplement())
-                .neighborhood(response.getNeighborhood())
-                .city(response.getCity())
-                .state(response.getState())
-                .zipCode(response.getZipCode())
-                .customerId(response.getCustomerId())
-                .build();
-    }
-
-    public static AddressResponse parse(Address model) {
-        return AddressResponse.builder()
-                .id(model.getId())
-                .publicPlace(model.getPublicPlace())
-                .number(model.getNumber())
-                .complement(model.getComplement())
-                .neighborhood(model.getNeighborhood())
-                .city(model.getCity())
-                .state(model.getState())
-                .zipCode(model.getZipCode())
-                .customerId(model.getCustomer().getId())
-                .build();
-    }
-
-    public static AddressResponse parse(AddressRequest request) {
-        return AddressResponse.builder()
-                .id(request.getId())
-                .publicPlace(request.getPublicPlace())
-                .number(request.getNumber())
-                .complement(request.getComplement())
-                .neighborhood(request.getNeighborhood())
-                .city(request.getCity())
-                .state(request.getState())
-                .zipCode(request.getZipCode())
-                .customerId(request.getCustomerId())
+                .id(id)
+                .publicPlace(publicPlace)
+                .number(number)
+                .complement(complement)
+                .neighborhood(neighborhood)
+                .city(city)
+                .state(state)
+                .zipCode(zipCode)
+                .customerId(customerId)
                 .build();
     }
 

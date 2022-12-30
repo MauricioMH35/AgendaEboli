@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ContactRepository extends JpaRepository<Contact, Long> {
+public interface ContactRepository extends JpaRepository<Contact, Integer> {
 
     Optional<Contact> findByContact(String contact);
 
@@ -19,6 +19,6 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
 
     @Modifying
     @Query("SELECT c FROM Contact c WHERE c.customer.id=?1")
-    List<Contact> findByCustomerId(Long customerId);
+    List<Contact> findByCustomerId(Integer customerId);
 
 }

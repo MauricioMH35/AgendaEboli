@@ -1,28 +1,29 @@
 package br.com.eboli.models;
 
-import br.com.eboli.models.requests.AddressRequest;
 import lombok.*;
-import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
-@RequiredArgsConstructor
 @AllArgsConstructor
-@Data
+@RequiredArgsConstructor
+@Getter
+@Setter
 @EqualsAndHashCode
 @ToString
 @Builder
-@DynamicUpdate
+
+@DynamicInsert
 @Entity
 @Table(name = "tbl_addresses")
 public class Address implements Serializable {
 
-    public final static long serialVersionUID = 1l;
+    public static final long serialVersionUID = 1l;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long id;
+    private final Integer id;
 
     @Column(nullable = false, length = 128)
     private final String publicPlace;
@@ -30,29 +31,26 @@ public class Address implements Serializable {
     @Column(nullable = false, length = 6)
     private final Integer number;
 
-    @Column(length = 32)
+    @Column(length = 12)
     private final String complement;
 
     @Column(nullable = false, length = 128)
     private final String neighborhood;
 
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 64)
     private final String city;
 
     @Column(nullable = false, length = 2)
     private final String state;
 
-    @Column(nullable = false, length = 14)
+    @Column(nullable = false, length = 8)
     private final String zipCode;
 
-    @OneToOne(
-            fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
+    private Customer customer = new Customer();
 
-    private Address() {
+    public Address() {
         this.id = null;
         this.publicPlace = null;
         this.number = null;
@@ -63,17 +61,33 @@ public class Address implements Serializable {
         this.zipCode = null;
     }
 
-    public Address updateAddress(AddressRequest request) {
-        String publicPlace = request.getPublicPlace() != this.publicPlace ? request.getPublicPlace() : this.publicPlace;
-        Integer number = request.getNumber() != this.number ? request.getNumber() : this.number;
-        String complement = request.getComplement() != this.complement ? request.getComplement() : this.complement;
-        String neighborhood = request.getNeighborhood() != this.neighborhood ? request.getNeighborhood() : this.neighborhood;
-        String city = request.getCity() != this.city ? request.getCity() : this.city;
-        String state = request.getState() != this.state ? request.getState() : this.state;
-        String zipCode = request.getZipCode() != this.zipCode ? request.getZipCode() : this.zipCode;
+    public Address update(Address updated) {
+        String publicPlace = getPublicPlace().compareTo(updated.getPublicPlace()) == 0 ?
+                getPublicPlace() : updated.getPublicPlace();
+
+        Integer number = getNumber() == updated.getNumber() ?
+                getNumber() : updated.getNumber();
+
+        String complement = getComplement().compareTo(updated.getComplement()) == 0 ?
+                getComplement() : updated.getComplement();
+
+        String neighborhood = getNeighborhood().compareTo(updated.getNeighborhood()) == 0 ?
+                getNeighborhood() : updated.getNeighborhood();
+
+        String city = getCity().compareTo(updated.getCity()) == 0 ?
+                getCity() : updated.getCity();
+
+        String state = getState().compareTo(updated.getState()) == 0 ?
+                getState() : updated.getState();
+
+        String zipCode = getZipCode().compareTo(updated.getZipCode()) == 0 ?
+                getZipCode() : updated.getZipCode();
+
+        Customer customer = getCustomer().equals(updated.getCustomer()) ?
+                getCustomer() : updated.getCustomer();
 
         return Address.builder()
-                .id(this.id)
+                .id(getId())
                 .publicPlace(publicPlace)
                 .number(number)
                 .complement(complement)
@@ -81,13 +95,7 @@ public class Address implements Serializable {
                 .city(city)
                 .state(state)
                 .zipCode(zipCode)
-                .customer(Customer.builder()
-                        .id(request.getCustomerId())
-                        .fullname(null)
-                        .cnpj(null)
-                        .foundation(null)
-                        .registered(null)
-                        .build())
+                .customer(customer)
                 .build();
     }
 

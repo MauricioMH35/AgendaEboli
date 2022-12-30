@@ -1,242 +1,332 @@
 package br.com.eboli.services.impls;
 
 import br.com.eboli.exceptions.ConflictException;
+import br.com.eboli.exceptions.InternalServereErrorException;
 import br.com.eboli.exceptions.NotFoundException;
+import br.com.eboli.models.Agenda;
 import br.com.eboli.models.Customer;
 import br.com.eboli.models.requests.CustomerRequest;
-import br.com.eboli.models.responses.CustomerResponse;
+import br.com.eboli.repositories.AgendaRepository;
 import br.com.eboli.repositories.CustomerRepository;
 import br.com.eboli.services.CustomerService;
-import br.com.eboli.utils.DateFormatter;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static br.com.eboli.utils.DateFormatter.*;
-import static br.com.eboli.utils.StringFormatter.replaceUnderscoreBySpace;
+import static br.com.eboli.models.requests.CustomerRequest.parseToRequest;
+import static br.com.eboli.utils.DateUtil.*;
+import static br.com.eboli.utils.StringUtil.replaceToSpace;
 
-@Component
+@Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CustomerServiceImpl implements CustomerService {
 
+    private Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
+
+    @Qualifier("customerRepository")
     private final CustomerRepository repository;
 
+    @Qualifier("agendaRepository")
+    private final AgendaRepository agendaRepository;
+
     @Override
-    public CustomerResponse save(CustomerRequest request) {
-        if (request.equals(new CustomerRequest()) || request.equals(null)) {
-            throw new IllegalArgumentException(
-                    "As informações do cliente devem ser informadas para proceguir com o cadastro.");
+    public CustomerRequest save(CustomerRequest request) {
+        if (request.fieldsAreBlank()) {
+            log.warn("As informações do cliente não são válidas.");
+            throw new IllegalArgumentException("As informações do cliente não são válidas.");
         }
 
-        boolean cnpjExists = repository.findByCnpj(request.getCnpj()).isPresent();
-        if (cnpjExists) {
+        if (repository.findByCnpj(request.getCnpj()).isPresent()) {
+            log.warn("O cliente com o CNPJ [" + request.getCnpj() + "] informado não pode ser cadastrado, " +
+                    "ja possui um cadastro.");
             throw new ConflictException(
-                    "Não é possível cadastrar o mesmo cliente.");
+                    "O cliente com o CNPJ [" + request.getCnpj() + "] informado não pode ser cadastrado, " +
+                            "ja possui um cadastro.");
         }
 
-        Long id = repository.save(
-                CustomerRequest.parseToModel(request)
-        ).getId();
-        request.setId(id);
-        return CustomerResponse.parse(request);
+        try {
+            if (request.getRegistered() == null || request.getRegistered() == "") {
+                request.setRegistered(
+                        parseDateTime(
+                                LocalDateTime.now(ZoneId.of("America/Sao_Paulo"))
+                        )
+                );
+            }
+
+            Integer id = repository.save(request.parse()).getId();
+            request.setId(id);
+
+        } catch (Exception e) {
+            log.error("Houve um erro interno ao servidor ao tentar cadastrar o cliente: " +
+                    "\tMessage: " + e.getMessage() +
+                    "\tCause: " + e.getCause());
+            throw new InternalServereErrorException("Houve um erro interno ao servidor ao tentar cadastrar o cliente.");
+
+        }
+
+        return request;
     }
 
     @Override
-    public Iterable<CustomerResponse> findAll() {
-        Iterable<CustomerResponse> responses = repository.findAll().stream()
-                .map(c -> CustomerResponse.parse(c))
-                .collect(Collectors.toList());
-        if (!responses.iterator().hasNext()) {
-            throw new NotFoundException("Não foi possivel encontrar clientes cadastrados.");
+    public CustomerRequest findById(Integer id) {
+        if (id == null || id <= 0) {
+            log.warn("O identificador informado [" + id + "] não é válido.");
+            throw new IllegalArgumentException("O identificador informado [" + id + "] não é válido.");
         }
 
-        return responses;
+        CustomerRequest request = parseToRequest(basicFindById(id));
+        return request;
     }
 
     @Override
-    public CustomerResponse findById(Long id) {
-        if (id == null || id == 0l) {
-            throw new IllegalArgumentException(
-                    "O identificador deve ser informado para realizar a operação.");
-        }
-
-        return CustomerResponse.parse(findByIdBasic(id));
-    }
-
-    @Override
-    public CustomerResponse findByCnpj(String cnpj) {
+    public CustomerRequest findByCnpj(String cnpj) {
         if (cnpj == null || cnpj == "") {
-            throw new IllegalArgumentException(
-                    "O CNPJ informado não é válido.");
+            log.warn("O CNPJ [" + cnpj + "] informado não é válido.");
+            throw new IllegalArgumentException("O CNPJ [" + cnpj + "] informado não é válido.");
         }
 
-        CustomerResponse response = CustomerResponse.parse(repository.findByCnpj(cnpj)
-                .orElseThrow(() -> new NotFoundException(
-                        "Não foi possivel encontrar o cliente indicado pelo CNPJ.")));
-
-        return response;
+        Customer found = basicFindByCnpj(cnpj);
+        return parseToRequest(found);
     }
 
     @Override
-    public Iterable<CustomerResponse> findByNameContains(String name) {
-        if (name == null || name == "") {
-            throw new IllegalArgumentException(
-                    "O nome informado não é valido para realizar a operação de busca.");
-        }
-
-        String changeName = replaceUnderscoreBySpace(name);
-        Iterable<CustomerResponse> responses = repository
-                .findByFullnameContains(changeName).stream()
-                .map(c -> CustomerResponse.parse(c))
-                .collect(Collectors.toList());
-
-        if (!responses.iterator().hasNext()) {
-            throw new NotFoundException(
-                    "Não foi possivel encontrar clientes que contenham o nome indicado.");
-        }
-
-        return responses;
-    }
-
-    @Override
-    public Iterable<CustomerResponse> findByFoundation(String foundation) {
-        if (foundation == "" || !checkDatePattern(foundation)) {
-            throw new IllegalArgumentException(
-                    "A data de fundação do cliente não é válida.");
-        }
-
-        Iterable<CustomerResponse> responses = repository.findByFoundation(
-                    DateFormatter.parseDate(foundation)
-                ).stream()
-                .map(c -> CustomerResponse.parse(c))
-                .collect(Collectors.toList());
-
-        if (!responses.iterator().hasNext()) {
-            throw new NotFoundException(
-                    "Não foi possivel encontrar clientes com data de fundação indicada.");
-        }
-
-        return responses;
-    }
-
-    @Override
-    public Iterable<CustomerResponse> findByFoundationBetween(String startTarget, String endTarget) {
-        boolean checkIsValid = startTarget != null &&
-                        endTarget != null &&
-                        checkDatePattern(startTarget) &&
-                        checkDatePattern(endTarget);
-
-        if (!checkIsValid) {
-            throw new IllegalArgumentException(
-                    "As datas de fundação não são validas.");
-        }
-
-        Iterable<CustomerResponse> responses;
-        responses = repository.findByFoundationBetween(
-                        DateFormatter.parseDate(startTarget),
-                        DateFormatter.parseDate(endTarget)
-                ).stream()
-                .map(c -> CustomerResponse.parse(c))
-                .collect(Collectors.toList());
-
-        if (!responses.iterator().hasNext()) {
-            throw new NotFoundException(
-                    "Não foi possivel encontrar clientes entre as datas de fundação.");
-        }
-
-        return responses;
-    }
-
-    @Override
-    public Iterable<CustomerResponse> findByRegistered(String target) {
-        boolean checkIsValid = target != null && checkDateTimePattern(target);
-
-        if (!checkIsValid) {
-            throw new IllegalArgumentException(
-                    "A data de registro informada não é valida");
-        }
-
-        LocalDateTime registerd = DateFormatter.parseDateTime(replaceUnderscoreBySpace(target));
-        Iterable<CustomerResponse> responses = repository.findByRegistered(registerd)
+    public List<CustomerRequest> findAll() {
+        List<CustomerRequest> found = repository.findAll()
                 .stream()
-                .map(c -> CustomerResponse.parse(c))
+                .map(c -> parseToRequest(c))
                 .collect(Collectors.toList());
 
-        if (!responses.iterator().hasNext()) {
-            throw new NotFoundException(
-                    "Não é possivel encontrar clientes registrados na data indicada.");
+        if (found.isEmpty()) {
+            log.warn("Não foram encontrados clientes cadastrados.");
+            throw new NotFoundException("Não foram encontrados clientes cadastrados.");
         }
 
-        return responses;
+        return found;
     }
 
     @Override
-    public Iterable<CustomerResponse> findByRegisteredBetween(String startTarget, String endTarget) {
-        boolean checkIsValid =
-                startTarget != null &&
-                        endTarget != null &&
-                        checkDateTimePattern(startTarget) &&
-                        checkDateTimePattern(endTarget);
-        if (!checkIsValid) {
-            throw new IllegalArgumentException(
-                    "As datas de registro não são validas.");
+    public List<CustomerRequest> find(Map<String, String> params) {
+        if (params.containsKey("name")) {
+            return basicFindByNameContains(params.get("name"))
+                    .stream()
+                    .map(c -> parseToRequest(c))
+                    .collect(Collectors.toList());
+
+        } else if (params.containsKey("foundation")) {
+            return basicFindByFoundation(params.get("foundation"))
+                    .stream()
+                    .map(c -> parseToRequest(c))
+                    .collect(Collectors.toList());
+
+        } else if (params.containsKey("foundation-start") && params.containsKey("foundation-end")) {
+            return basicFindByFoundationBetween(params.get("foundation-start"), params.get("foundation-end"))
+                    .stream()
+                    .map(c -> parseToRequest(c))
+                    .collect(Collectors.toList());
+
+        } else if (params.containsKey("registered")) {
+            return basicFindByRegistered(params.get("registered"))
+                    .stream()
+                    .map(c -> parseToRequest(c))
+                    .collect(Collectors.toList());
+
+        } else if (params.containsKey("registered-start") && params.containsKey("registered-end")) {
+            return basicFindByRegisteredBetween(params.get("registered-start"), params.get("registered-end"))
+                    .stream()
+                    .map(c -> parseToRequest(c))
+                    .collect(Collectors.toList());
+
+        } else {
+            log.error("A consulta não pode ser realizada, pois a informação não é válida para qualquer operação " +
+                    "possivel.");
+
+            throw new IllegalArgumentException("A consulta não pode ser realizada, pois a informação não é válida " +
+                    "para qualquer operação possivel.");
         }
-
-        LocalDateTime registeredStart = parseDateTime(replaceUnderscoreBySpace(startTarget));
-        LocalDateTime registeredEnd = parseDateTime(replaceUnderscoreBySpace(endTarget));
-
-        Iterable<CustomerResponse> responses = repository.findByRegisteredBetween(
-                        registeredStart, registeredEnd
-                ).stream()
-                .map(c -> CustomerResponse.parse(c))
-                .collect(Collectors.toList());
-
-        if (!responses.iterator().hasNext()) {
-            throw new NotFoundException(
-                    "Não foi encontrado clientes registrado entre as datas indicadas.");
-        }
-
-        return responses;
     }
 
     @Override
-    public CustomerResponse updateById(Long id, CustomerRequest request) {
-        if (id == null || request.equals(new CustomerRequest())) {
-            throw new IllegalArgumentException(
-                    "As informações passdas são invalidas.");
+    public CustomerRequest updateById(Integer id, CustomerRequest request) {
+        if (id == null || id <= 0) {
+            log.warn("O identificador [" + id + "] informado não é válido.");
+            throw new IllegalArgumentException("O identificador [" + id + "] informado não é válido.");
         }
 
-        Customer saved = repository.save(
-                findByIdBasic(id)
-                        .updateCustomer(request)
-        );
-        return CustomerResponse.parse(saved);
+        Customer found = basicFindById(id);
+
+        try {
+            request.setId(id);
+            Customer updated = found.update(request.parse());
+            repository.save(updated);
+            request = parseToRequest(updated);
+
+        } catch (Exception e) {
+            log.error("Houve um erro interno ao servidor ao tentar atualizar o cliente com id [" + id + "]: " +
+                    "\tMessage: " + e.getMessage() +
+                    "\tCause: " + e.getCause());
+
+            throw new InternalServereErrorException("Houve um erro interno ao servidor ao tentar atualizar o cliente " +
+                    "com id [" + id + "].");
+        }
+
+        return request;
     }
 
     @Override
-    public void deleteById(@PathVariable Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException(
-                    "O identificado informado não é valido.");
+    public void deleteById(Integer id) {
+        if (id == null || id <= 0) {
+            log.warn("O identificador informado [" + id + "] não é válido.");
+            throw new IllegalArgumentException("O identificador informado [" + id + "] não é válido.");
         }
 
-        Customer found = findByIdBasic(id);
-        repository.delete(found);
+        basicFindById(id);
+
+        List<Agenda> agenda = agendaRepository.findByCustomerId(id);
+        if (!agenda.isEmpty()) {
+            log.warn("Existem eventos agendados com o cliente de id [" + id + "]. Para Prosseguir com a operação " +
+                    "de remoção do clinte, os eventos marcados com o cliente deverão ser removidos.");
+
+            throw new IllegalArgumentException("Existem eventos agendados com o cliente de id [" + id + "]. " +
+                    "Para Prosseguir com a operação de remoção do clinte, os eventos marcados com o cliente " +
+                    "deverão ser removidos.");
+        }
+
+        try {
+            repository.deleteById(id);
+
+        } catch (Throwable e) {
+            log.error("Houve um erro ao tentar remover o cliente com id [" + id + "]." +
+                    "\tMessage: " + e.getMessage() +
+                    "\tCause: " + e.getCause());
+            throw new InternalServereErrorException("Houve um erro ao tentar remover o cliente com id [" + id + "].");
+        }
+        log.info("Foi removido da base de dados o cliente com id [" + id + "].");
     }
 
-    private Customer findByIdBasic(Long id) {
+    private Customer basicFindById(Integer id) {
         return repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Não foi possivel encontrar o cliente com o identificador [" +
+                        id + "] informado."));
+    }
+
+    private Customer basicFindByCnpj(String cnpj) {
+        return repository.findByCnpj(cnpj)
                 .orElseThrow(() -> new NotFoundException(
-                        "Não foi possivel encontrar o cliente indicado pelo identificador."));
+                        "Não foi possivel encontrar o cliente com o CNPJ [" + cnpj + "] informado."));
+    }
+
+    private List<Customer> basicFindByNameContains(String name) {
+        if (name == "") {
+            log.warn("O nome [" + name + "] informado não é válido.");
+            throw new IllegalArgumentException("O nome [" + name + "] informado não é válido.");
+        }
+
+        String WithoutUnderscore = replaceToSpace(name);
+        List<Customer> found = repository.findByFullnameContains(WithoutUnderscore);
+
+        if (found.isEmpty()) {
+            log.warn("Não foi possivel encontrar clientes que contenham o nome [" + name + "].");
+            throw new NotFoundException("Não foi possivel encontrar clientes que contenham o nome [" + name + "].");
+        }
+
+        return found;
+    }
+
+    private List<Customer> basicFindByFoundation(String foundation) {
+        if (foundation == "" || !isDate(foundation)) {
+            log.warn("A data [" + foundation + "] de foundação não é válida.");
+            throw new IllegalArgumentException("A data [" + foundation + "] de foundação não é válida.");
+        }
+
+        LocalDate foundationDate = parseDate(foundation);
+        List<Customer> found = repository.findByFoundation(foundationDate);
+
+        if (found.isEmpty()) {
+            log.warn("Não foi possivel encontrar o clientes com a data [" + foundation + "] de fundação.");
+            throw new NotFoundException("Não foi possivel encontrar o clientes com a data [" + foundation +
+                    "] de fundação.");
+        }
+
+        return found;
+    }
+
+    private List<Customer> basicFindByFoundationBetween(String start, String end) {
+        if (start == "" || !isDate(start)) {
+            log.warn("A consulta entre datas de fundação não é válida para a data [" + start + "] incial.");
+            throw new IllegalArgumentException("A consulta entre datas de fundação não é válida para a data [" +
+                    start + "] incial.");
+        }
+
+        if (end == "" || !isDate(end)) {
+            log.warn("A consulta entre datas de fundação não é válida para a data [" + end + "] final.");
+            throw new IllegalArgumentException("A consulta entre datas de fundação não é válida para a data [" +
+                    end + "] final.");
+        }
+
+        LocalDate startDate = parseDate(start);
+        LocalDate endDate = parseDate(end);
+        List<Customer> found = repository.findByFoundationBetween(startDate, endDate);
+
+        if (found.isEmpty()) {
+            log.warn("Não foi possivel encontrar clientes entre as datas [" + start + "] e [" + end + "] de fundação.");
+            throw new NotFoundException("Não foi possivel encontrar clientes entre as datas [" + start + "] e [" +
+                    end + "] de fundação.");
+        }
+
+        return found;
+    }
+
+    private List<Customer> basicFindByRegistered(String registered) {
+        boolean registeredIsValid = registered != null || registered != "";
+        if (!registeredIsValid || !isDateTime(registered)) {
+            log.warn("A data [" + registered + "] de registro informada não é válida.");
+            throw new IllegalArgumentException("A data [" + registered + "] de registro informada não é válida.");
+        }
+
+        LocalDateTime registeredDateTime = parseDateTime(registered);
+        List<Customer> found = repository.findByRegistered(registeredDateTime);
+
+        if (found.isEmpty()) {
+            log.warn("Não foi possivel encontrar clientes registrados na data [" + registered + "].");
+            throw new NotFoundException("Não foi possivel encontrar clientes registrados na data [" + registered + "].");
+        }
+
+        return found;
+    }
+
+    private List<Customer> basicFindByRegisteredBetween(String start, String end) {
+        if (start == "" || !isDateTime(start)) {
+            log.warn("A consulta entre datas de registro não é válida para a data [" + start + "] incial.");
+            throw new IllegalArgumentException("A consulta entre datas de registro não é válida para a data [" + start +
+                    "] incial.");
+        }
+
+        if (end == "" || !isDateTime(end)) {
+            log.warn("A consulta entre datas de registro não é válida para a data [" + end + "] final.");
+            throw new IllegalArgumentException("A consulta entre datas de registro não é válida para a data [" + end +
+                    "] final.");
+        }
+
+        LocalDateTime startDateTime = parseDateTime(start);
+        LocalDateTime endDateTime = parseDateTime(end);
+        List<Customer> found = repository.findByRegisteredBetween(startDateTime, endDateTime);
+
+        if (found.isEmpty()) {
+            log.warn("Não foi possivel encontrar clientes registrados entre as datas [" + start + "] e [" + end + "]");
+            throw new NotFoundException("Não foi possivel encontrar clientes registrados entre as datas [" + start +
+                    "] e [" + end + "].");
+        }
+        return found;
     }
 
 }
