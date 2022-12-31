@@ -495,6 +495,7 @@ class CustomerServiceImplTest {
     @DisplayName("When Update By Id And Returns Illegal Argumant Exception Id Less Or Equal To Zero")
     void updateById_IllegalArgumantExceptionIdLessOrEqualToZero() {
         Integer id = -1;
+
         assertThatThrownBy(() -> underTest.updateById(id, request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("O identificador [" + id + "] informado não é válido.");
@@ -528,6 +529,7 @@ class CustomerServiceImplTest {
     @DisplayName("When Delete By Id And Returns Illegal Argument Exception Id Null")
     void deleteById_IllegalArgumentExceptionIdNull() {
         Integer id = null;
+
         assertThatThrownBy(() -> underTest.deleteById(id))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("O identificador informado [" + id + "] não é válido.");
