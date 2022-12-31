@@ -2,84 +2,74 @@ package br.com.eboli.models.requests;
 
 import br.com.eboli.models.Customer;
 import br.com.eboli.models.responses.CustomerResponse;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
-import static br.com.eboli.utils.DateFormatter.parseDate;
-import static br.com.eboli.utils.DateFormatter.parseDateTime;
+import java.io.Serializable;
+
+import static br.com.eboli.utils.DateUtil.*;
 
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Data
+@EqualsAndHashCode
+@ToString
 @Builder
-public class CustomerRequest {
+public class CustomerRequest implements Serializable {
 
-    private Long id;
-    private String fullname;
-    private String cnpj;
-    private String foundation;
-    private String registered;
+    public static final long serialVersionUID = 1l;
+
+    @JsonProperty private Integer id;
+    @JsonProperty private String fullname;
+    @JsonProperty private String cnpj;
+    @JsonProperty private String foundation;
+    @JsonProperty private String registered;
 
     public Customer parse() {
         return Customer.builder()
-                .id(this.id)
-                .fullname(this.fullname)
-                .cnpj(this.cnpj)
-                .foundation(parseDate(this.foundation))
-                .registered(parseDateTime(this.registered))
+                .id(id)
+                .fullname(fullname)
+                .cnpj(cnpj)
+                .foundation(parseDate(foundation))
+                .registered(parseDateTime(registered))
                 .build();
     }
 
     public CustomerResponse parseToResponse() {
         return CustomerResponse.builder()
-                .id(this.id)
-                .fullname(this.fullname)
-                .cnpj(this.cnpj)
-                .foundation(this.foundation)
-                .registered(this.registered)
+                .id(id)
+                .fullname(fullname)
+                .cnpj(cnpj)
+                .foundation(foundation)
+                .registered(registered)
                 .build();
     }
 
-    public static Customer parseToModel(CustomerRequest request) {
-        return Customer.builder()
-                .id(request.getId())
-                .fullname(request.getFullname())
-                .cnpj(request.getCnpj())
-                .foundation(parseDate(request.getFoundation()))
-                .registered(parseDateTime(request.getRegistered()))
-                .build();
-    }
+    public static CustomerRequest parseToRequest(Customer customer) {
+        if (customer.getRegistered() != null) {
+            return CustomerRequest.builder()
+                    .id(customer.getId())
+                    .fullname(customer.getFullname())
+                    .cnpj(customer.getCnpj())
+                    .foundation(parseDate(customer.getFoundation()))
+                    .registered(parseDateTime(customer.getRegistered()))
+                    .build();
+        }
 
-    public static CustomerResponse parseToResponse(CustomerRequest request) {
-        return CustomerResponse.builder()
-                .id(request.getId())
-                .fullname(request.getFullname())
-                .cnpj(request.getCnpj())
-                .foundation(request.getFoundation())
-                .registered(request.getRegistered())
-                .build();
-    }
-
-    public static CustomerRequest parse(Customer model) {
         return CustomerRequest.builder()
-                .id(model.getId())
-                .fullname(model.getFullname())
-                .cnpj(model.getCnpj())
-                .foundation(parseDate(model.getFoundation()))
-                .registered(parseDateTime(model.getRegistered()))
+                .id(customer.getId())
+                .fullname(customer.getFullname())
+                .cnpj(customer.getCnpj())
+                .foundation(parseDate(customer.getFoundation()))
                 .build();
     }
 
-    public static CustomerRequest parse(CustomerResponse response) {
-        return CustomerRequest.builder()
-                .id(response.getId())
-                .fullname(response.getFullname())
-                .cnpj(response.getCnpj())
-                .foundation(response.getFoundation())
-                .registered(response.getRegistered())
-                .build();
+    public Boolean fieldsAreBlank() {
+        return this.fullname == null ||
+                this.cnpj == null ||
+                this.foundation == null ||
+                this.foundation == "" ||
+                !isDate(this.foundation);
     }
 
 }

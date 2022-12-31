@@ -1,7 +1,6 @@
 package br.com.eboli.repositories;
 
 import br.com.eboli.models.Contact;
-import br.com.eboli.models.Customer;
 import br.com.eboli.models.enums.ContactType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ContactRepository extends JpaRepository<Contact, Long> {
+public interface ContactRepository extends JpaRepository<Contact, Integer> {
 
     Optional<Contact> findByContact(String contact);
 
@@ -20,6 +19,6 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
 
     @Modifying
     @Query("SELECT c FROM Contact c WHERE c.customer.id=?1")
-    List<Contact> findByCustomerId(Long customerId);
+    List<Contact> findByCustomerId(Integer customerId);
 
 }

@@ -1,4 +1,0 @@
-exceptions:
-  messages:
-    customerControllerSaveIllegal: 'As informações do cliente devem ser informadas para realizar a operação desejada.'
-    customerControllerSaveConflict: 'Não é possível cadastrar um CNPJ de um cliente já cadastrado.'

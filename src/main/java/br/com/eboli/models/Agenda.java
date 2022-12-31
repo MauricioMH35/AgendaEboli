@@ -1,25 +1,20 @@
 package br.com.eboli.models;
 
-import br.com.eboli.models.requests.AgendaRequest;
-import br.com.eboli.models.utils.CustomerUtil;
-import br.com.eboli.utils.DateFormatter;
-import br.com.eboli.utils.StringFormatter;
 import lombok.*;
-import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
-@RequiredArgsConstructor
 @AllArgsConstructor
-@Data
+@RequiredArgsConstructor
+@Getter
+@Setter
 @EqualsAndHashCode
-@ToString
 @Builder
-@DynamicUpdate
+
+@DynamicInsert
 @Entity
 @Table(name = "tbl_agenda")
 public class Agenda implements Serializable {
@@ -28,9 +23,9 @@ public class Agenda implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long id;
+    private final Integer id;
 
-    @Column(length = 128, nullable = false)
+    @Column(nullable = false, length = 128)
     private final String title;
 
     @Column
@@ -39,16 +34,15 @@ public class Agenda implements Serializable {
     @Column(nullable = false)
     private final LocalDateTime markedTo;
 
-    @Column
+    @Column(nullable = false)
     private final Boolean concluded;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "tbl_agenda_customers",
-            joinColumns = @JoinColumn(name = "agenda_id"),
-            inverseJoinColumns = @JoinColumn(name = "customer_id"))
-    private Set<Customer> customers = new LinkedHashSet<>();
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
+    private Customer customer;
 
-    private Agenda() {
+    public Agenda() {
         this.id = null;
         this.title = null;
         this.description = null;
@@ -56,23 +50,44 @@ public class Agenda implements Serializable {
         this.concluded = null;
     }
 
-    public Agenda updateAgenda(AgendaRequest request) {
-        LocalDateTime markedToRequest = DateFormatter.parseDateTime(
-                StringFormatter.replaceUnderscoreBySpace(request.getMarkedTo()));
+    public Agenda update(Agenda updated) {
+        String title = getTitle().compareTo(updated.getTitle()) == 0 ?
+                getTitle() : updated.getTitle();
 
-        String title = request.getTitle().equals(this.title) ? this.title : request.getTitle();
-        String description = request.getDescription().equals(this.description) ? this.description : request.getDescription();
-        LocalDateTime markedTo = markedToRequest.equals(this.markedTo) ? this.markedTo : markedToRequest;
-        Boolean concluded = request.getConcluded().equals(this.concluded) ? this.concluded : request.getConcluded();
+        String description = getDescription().compareTo(updated.getDescription()) == 0 ?
+                getDescription() : updated.getDescription();
+
+        LocalDateTime markedTo = getMarkedTo().compareTo(updated.getMarkedTo()) == 0 ?
+                getMarkedTo() : updated.getMarkedTo();
+
+        Boolean concluded = getConcluded().compareTo(updated.getConcluded()) == 0 ?
+                getConcluded() : updated.getConcluded();
 
         return Agenda.builder()
-                .id(this.id)
+                .id(getId())
                 .title(title)
                 .description(description)
                 .markedTo(markedTo)
                 .concluded(concluded)
-                .customers(CustomerUtil.proccessToIds(request.getCustomerIds()))
+                .customer(getCustomer())
                 .build();
     }
 
+    @Override
+    public String toString() {
+        return "Agenda{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", markedTo=" + markedTo +
+                ", concluded=" + concluded +
+                ", customer{" +
+                "id=" + customer.getId() +
+                "fullname='" + customer.getFullname() + '\'' +
+                "cnpj='" + customer.getCnpj() + '\'' +
+                "foudation='" + customer.getFoundation() + '\'' +
+                "registered='" + customer.getRegistered() + '\'' +
+                '}' +
+                '}';
+    }
 }

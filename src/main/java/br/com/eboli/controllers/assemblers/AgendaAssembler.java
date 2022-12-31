@@ -5,64 +5,28 @@ import br.com.eboli.models.requests.AgendaRequest;
 import br.com.eboli.models.responses.AgendaResponse;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-@Component
 public class AgendaAssembler {
 
-    public static AgendaResponse toModel(AgendaResponse response) {
-        response.add(linkTo(methodOn(AgendaController.class)
-                .findById(response.getId())
-        ).withSelfRel());
-        response.add(linkTo(methodOn(AgendaController.class)
-                .deleteById(response.getId())
-        ).withRel("delete-by-id"));
-        response.add(linkTo(methodOn(AgendaController.class)
-                .find(Map.of("title", response.getTitle()))
-        ).withRel("find-by-title"));
-        response.add(linkTo(methodOn(AgendaController.class)
-                .find(Map.of("marked", response.getMarkedTo()))
-        ).withRel("find-by-marked"));
-        response.add(linkTo(methodOn(AgendaController.class)
-                .find(Map.of(
-                        "marked-start", response.getMarkedTo(),
-                        "marked-end", "2023-05-01"))
-        ).withRel("find-by-marked"));
-        response.add(linkTo(methodOn(AgendaController.class)
-                .find(Map.of("concluded", response.getConcluded().toString()))
-        ).withRel("find-by-concluded"));
-        response.add(linkTo(methodOn(AgendaController.class)
-                .findAll()
-        ).withRel(IanaLinkRelations.COLLECTION));
-
-        return response;
-    }
-
     public static AgendaResponse toModel(AgendaRequest request) {
-        AgendaResponse response = AgendaResponse.parse(request);
+        AgendaResponse response = request.parseToResponse();
 
         response.add(linkTo(methodOn(AgendaController.class)
                 .findById(response.getId())
         ).withSelfRel());
         response.add(linkTo(methodOn(AgendaController.class)
-                .deleteById(response.getId())
-        ).withRel("delete-by-id"));
-        response.add(linkTo(methodOn(AgendaController.class)
                 .find(Map.of("title", response.getTitle()))
         ).withRel("find-by-title"));
         response.add(linkTo(methodOn(AgendaController.class)
-                .find(Map.of("marked", response.getMarkedTo()))
-        ).withRel("find-by-marked"));
-        response.add(linkTo(methodOn(AgendaController.class)
-                .find(Map.of(
-                        "marked-start", response.getMarkedTo(),
-                        "marked-end", "2023-05-01"))
-        ).withRel("find-by-marked"));
+                .find(Map.of("marked-to", response.getMarkedTo()))
+        ).withRel("find-by-marked-to"));
         response.add(linkTo(methodOn(AgendaController.class)
                 .find(Map.of("concluded", response.getConcluded().toString()))
         ).withRel("find-by-concluded"));
@@ -73,32 +37,29 @@ public class AgendaAssembler {
         return response;
     }
 
-    public static CollectionModel<AgendaResponse> toCollectionModel(Iterable<AgendaResponse> responses) {
-        for (AgendaResponse response : responses) {
-            response.add(linkTo(methodOn(AgendaController.class)
-                    .findById(response.getId())
-            ).withSelfRel());
-            response.add(linkTo(methodOn(AgendaController.class)
-                    .deleteById(response.getId())
-            ).withRel("delete-by-id"));
-            response.add(linkTo(methodOn(AgendaController.class)
-                    .find(Map.of("title", response.getTitle()))
-            ).withRel("find-by-title"));
-            response.add(linkTo(methodOn(AgendaController.class)
-                    .find(Map.of("marked", response.getMarkedTo()))
-            ).withRel("find-by-marked"));
-            response.add(linkTo(methodOn(AgendaController.class)
-                    .find(Map.of(
-                            "marked-start", response.getMarkedTo(),
-                            "marked-end", "2023-05-01"))
-            ).withRel("find-by-marked"));
-            response.add(linkTo(methodOn(AgendaController.class)
-                    .find(Map.of("concluded", response.getConcluded().toString()))
-            ).withRel("find-by-concluded"));
-        }
-        CollectionModel collection = CollectionModel.of(responses);
+    public static CollectionModel<AgendaResponse> toCollection(List<AgendaRequest> requests) {
+        Iterable<AgendaResponse> responses = requests.stream()
+                .map(a -> {
+                    AgendaResponse response = a.parseToResponse();
 
-        return collection;
+                    response.add(linkTo(methodOn(AgendaController.class)
+                            .findById(response.getId())
+                    ).withSelfRel());
+                    response.add(linkTo(methodOn(AgendaController.class)
+                            .find(Map.of("title", response.getTitle()))
+                    ).withRel("find-by-title"));
+                    response.add(linkTo(methodOn(AgendaController.class)
+                            .find(Map.of("marked-to", response.getMarkedTo()))
+                    ).withRel("find-by-marked-to"));
+                    response.add(linkTo(methodOn(AgendaController.class)
+                            .find(Map.of("concluded", response.getConcluded().toString()))
+                    ).withRel("find-by-concluded"));
+
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        return CollectionModel.of(responses);
     }
 
 }

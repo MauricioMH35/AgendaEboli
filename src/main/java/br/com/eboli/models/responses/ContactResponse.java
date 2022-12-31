@@ -4,86 +4,42 @@ import br.com.eboli.models.Contact;
 import br.com.eboli.models.Customer;
 import br.com.eboli.models.enums.ContactType;
 import br.com.eboli.models.requests.ContactRequest;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-@Builder
-public class ContactResponse extends RepresentationModel<ContactResponse> {
+import java.io.Serializable;
 
-    private Long id;
-    private ContactType type;
-    private String contact;
-    private Long customerId;
+@AllArgsConstructor
+@RequiredArgsConstructor
+@Data
+@EqualsAndHashCode
+@ToString
+@Builder
+public class ContactResponse extends RepresentationModel<ContactResponse> implements Serializable {
+
+    public static final long serialVersionUID = 1l;
+
+    @JsonProperty private Integer id;
+    @JsonProperty private ContactType type;
+    @JsonProperty private String contact;
+    @JsonProperty private Integer customerId;
 
     public Contact parse() {
         return Contact.builder()
-                .id(this.id)
-                .type(this.type)
-                .contact(this.contact)
-                .customer(Customer.builder()
-                        .id(this.customerId)
-                        .fullname(null)
-                        .cnpj(null)
-                        .foundation(null)
-                        .registered(null)
-                        .build())
+                .id(id)
+                .type(type)
+                .contact(contact)
+                .customer(Customer.builder().id(customerId).build())
                 .build();
     }
 
     public ContactRequest parseToRequest() {
         return ContactRequest.builder()
-                .id(this.id)
-                .type(this.type)
-                .contact(this.contact)
-                .customerId(this.customerId)
-                .build();
-    }
-
-    public static Contact parseToModel(ContactResponse response) {
-        return Contact.builder()
-                .id(response.id)
-                .type(response.type)
-                .contact(response.contact)
-                .customer(Customer.builder()
-                        .id(response.customerId)
-                        .fullname(null)
-                        .cnpj(null)
-                        .foundation(null)
-                        .registered(null)
-                        .build())
-                .build();
-    }
-
-    public static ContactRequest parseToResponse(ContactResponse response) {
-        return ContactRequest.builder()
-                .id(response.id)
-                .type(response.type)
-                .contact(response.contact)
-                .customerId(response.customerId)
-                .build();
-    }
-
-    public static ContactResponse parse(Contact model) {
-        return ContactResponse.builder()
-                .id(model.getId())
-                .type(model.getType())
-                .contact(model.getContact())
-                .customerId(model.getCustomer().getId())
-                .build();
-    }
-
-    public static ContactResponse parse(ContactRequest request) {
-        return ContactResponse.builder()
-                .id(request.getId())
-                .type(request.getType())
-                .contact(request.getContact())
-                .customerId(request.getCustomerId())
+                .id(id)
+                .type(type)
+                .contact(contact)
+                .customerId(customerId)
                 .build();
     }
 
