@@ -246,15 +246,8 @@ public class AgendaServiceImpl implements AgendaService {
 
     @Override
     public List<AgendaRequest> findByConcluded(String concluded) {
-        boolean concludedNotValid =
-                concluded == null ||
-                        concluded == "" &&
-                                (
-                                        !concluded.equalsIgnoreCase("true") ||
-                                                !concluded.equalsIgnoreCase("false")
-                                );
-
-        if (concludedNotValid) {
+        boolean concludedNotValid = concluded == null || concluded == "";
+        if (concludedNotValid || !isBooleanValid(concluded)) {
             log.warn("Não é válido a informação para realizar a operação.");
             throw new IllegalArgumentException("Não é válido a informação para realizar a operação.");
         }
