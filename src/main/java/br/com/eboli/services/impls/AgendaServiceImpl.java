@@ -133,12 +133,9 @@ public class AgendaServiceImpl implements AgendaService {
             throw new IllegalArgumentException("O titulo [" + title + "] não é válido.");
         }
 
-        List<AgendaRequest> requests = new ArrayList<>();
+        String replaceTitle = "";
         try {
-            requests = repository.findByTitleContains(replaceToSpace(title))
-                    .stream()
-                    .map(a -> parseToRequest(a))
-                    .collect(Collectors.toList());
+            replaceTitle = replaceToSpace(title);
 
         } catch (Exception e) {
             log.error("Houve um erro interno ao servidor ao tentar buscar o evento agendado com que possa conter " +
@@ -149,6 +146,11 @@ public class AgendaServiceImpl implements AgendaService {
             throw new InternalServereErrorException("Houve um erro interno ao servidor ao tentar buscar o evento " +
                     "agendado com que possa conter titulo [" + title + "].");
         }
+
+        List<AgendaRequest> requests = repository.findByTitleContains(replaceTitle)
+                .stream()
+                .map(a -> parseToRequest(a))
+                .collect(Collectors.toList());
 
         if (requests.isEmpty()) {
             log.warn("Não foram encontrados eventos agendados que contenham o titulo [" + title + "] informado.");
