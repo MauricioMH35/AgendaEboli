@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import static br.com.eboli.models.requests.AgendaRequest.parseToRequest;
 import static br.com.eboli.utils.DateUtil.isDateTime;
 import static br.com.eboli.utils.DateUtil.parseDateTime;
+import static br.com.eboli.utils.StringUtil.isBooleanValid;
 import static br.com.eboli.utils.StringUtil.replaceToSpace;
 
 @Service
@@ -36,7 +37,7 @@ public class AgendaServiceImpl implements AgendaService {
     @Qualifier("agendaRepository")
     private final AgendaRepository repository;
 
-    private final Clock clock = Clock.system(ZoneId.of("America/Sao_Paulo"));
+    private final Clock clock;
 
     @Override
     public AgendaRequest save(AgendaRequest request) {
@@ -46,8 +47,7 @@ public class AgendaServiceImpl implements AgendaService {
         }
 
         LocalDateTime markedTo = null;
-        ZoneId zoneId = ZoneId.of("America/Sao_Paulo");
-        LocalDateTime dateTimeNow = LocalDateTime.now(clock.withZone(zoneId));
+        LocalDateTime dateTimeNow = LocalDateTime.now(clock);
         try {
             markedTo = parseDateTime(request.getMarkedTo());
 
