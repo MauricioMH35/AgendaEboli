@@ -14,7 +14,7 @@ public class StringUtil {
     }
 
     public static Boolean isBooleanValid(String param) {
-        final String regex = "(true|false)";
+        final String regex = "(true|TRUE|false|FALSE)";
         final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
         final Matcher matcher = pattern.matcher(param);
         boolean valid = matcher.find();
