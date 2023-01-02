@@ -32,5 +32,21 @@ Figura 1: Diagrama Entidade Relacionamento - Agenda Éboli.
 Fonte: Autoria própria (MAURICIO, 2022).
 </p>
 
+<p style="text-align:justify;">
+Para iniciar a aplicação, realize a clonagem desse repositório com o comando no terminal no local que deseja cópiar os arquivos do projeto.
+</p>
+
+```
+git clone https://github.com/MauricioMH35/AgendaEboli.git
+```
+
+<p style="text-align:justify;">
+Agora para conseguir executar a aplicação utilize do comando mostra logo abaixo, para que o `Maven` consiga processeguir com os processos necessários para realizar está tarefa:
+</p>
+
+```
+mvn spring-bor:run
+```
+
 # Created 
 By Mauricio Mityo Hidani | December 12, 2022 | São Paulo - BR
