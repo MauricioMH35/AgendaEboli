@@ -26,7 +26,7 @@ As __Entidade__ e seus relacionamentos para a construção da Agenda Éboli pode
 Figura 1: Diagrama Entidade Relacionamento - Agenda Éboli. 
 </p>
 <p align="center">
-<img src="https://raw.githubusercontent.com/MauricioMH35/Assets/bd4073a6a20ef965040d905ffce0e590850e0a1b/AgendaEboli/erDiagra.svg" width="400"/>
+<img src="https://raw.githubusercontent.com/MauricioMH35/Assets/90f1cac6647a9e1f7b90494789ebcf3fda5fa7d3/AgendaEboli/erDiagra.svg" width="400"/>
 </p>
 <p align="center" style="font-size:10pt; color:rgb(130, 130, 130);">
 Fonte: Autoria própria (MAURICIO, 2022).
